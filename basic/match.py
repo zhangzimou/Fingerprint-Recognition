@@ -29,10 +29,10 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI,):
 	"""
 	endingT,bifurT,theta1T,theta2T = minutiaeExtract(imgT,imgforeT) 
 	endingI,bifurI,theta1I,theta2I = minutiaeExtract(imgI,imgforeI) #ending,bigur:n*2, theta:n*1
-	endingT = np.array(endingT.tolist()+bifurT.tolist())
-	endingI = np.array(endingI.tolist()+bifurI.tolist())
-	theta1T = np.array(theta1T.tolist()+theta2T.tolist())
-	theta1I = np.array(theta1I.tolist()+theta2I.tolist())
+	# endingT = np.array(endingT.tolist()+bifurT.tolist())
+	# endingI = np.array(endingI.tolist()+bifurI.tolist())
+	# theta1T = np.array(theta1T.tolist()+theta2T.tolist())
+	# theta1I = np.array(theta1I.tolist()+theta2I.tolist())
 	lengthT = len(endingT) #n
 	lengthI = len(endingI)
 	closest1T_r = [[1,1]]*3
@@ -59,11 +59,10 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI,):
 	iterations = 600
 	iteration = 1
 	requiredPoints = math.sqrt(lengthT*lengthI)/2 #number of matching points required to assert that the transformation fits well
-	print "Required matching points:"
-	print requiredPoints
+	# print "Required matching points: %d" % requiredPoints
 	matchedPoints_max = 0
-	R0 = 1 #threshold for sd
-	sigma0 = 1/180 #threshold for dd
+	R0 = 30 #threshold for sd
+	sigma0 = 20/180 #threshold for dd
 	from_pt = [[0,0]]*3
 	random.seed(10)
 	for iteration in range(1,iterations+1):
