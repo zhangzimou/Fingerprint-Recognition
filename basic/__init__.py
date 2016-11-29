@@ -34,8 +34,8 @@ for file in os.listdir(path):
 	count += 1
 #search all filenames for same images and acheive correct probability
 matchedPoints_max = np.zeros([80,80])
-for i in range(80):
-	for j in range(i+2,80-i-1):
+for i in range(0,80):
+	for j in range(i+8,80-i-1):
 		#input
 		img1 = cv2.imread(path+'/'+filename[i],0)
 		img2 = cv2.imread(path+'/'+filename[j],0)
@@ -53,9 +53,8 @@ for i in range(80):
 		imgB2=basic.binarize(imgE2)
 		imgT1=pre.thinning(imgB1)
 		imgT2=pre.thinning(imgB2)
-		print "Matched points:"
 		matchedPoints_max[i][j] = minutiaeMatch(imgT1, imgT2, imgfore1, imgfore2)
-		print matchedPoints_max[i][j]
+		print "Matched points: %d\n" % matchedPoints_max[i][j]
 
 
 
