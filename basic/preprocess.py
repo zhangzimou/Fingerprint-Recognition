@@ -36,8 +36,12 @@ def enhance(img,blockSize=16):
     theta=calcDirection(img,blockSize)
     wl=calcWl(img,blockSize)
     #img=ridgeComp2(img,theta,blockSize)
+    # inverse
+    img=255-img
     img=GaborFilter(img,blockSize,wl,np.pi/2-theta)
-    img[np.where(imgfore==255)]=255
+    # inverse
+#    img=255-img
+    img[np.where(imgfore==0)]=255
     return img
 
  
@@ -53,27 +57,170 @@ def foreground(img,blockSize=31):
     img[np.where(img>0)]=255
     return img
 
-def segmentation(img,h=480,w=320):
+def align(img, valid):
+    N,M=np.shape(img)
+    index=np.where(valid==1)
+    nmin=np.min(index[0]);nmax=np.max(index[0]);mmin=np.min(index[1]);mmax=np.max(index[1])
+    nmid,mmid=(nmin+nmax)/2,(mmin+mmax)/2
+    # move the foreground to the center of the image
+    if nmid-N/2>0:
+        img=np.vstack(
+                      (
+                       img,
+                       255*np.ones((nmid-N/2, img.shape[1]))
+                       )
+                      )
+        img=np.delete(img,range(nmid-N/2),axis=0)
+    elif N/2-nmid>0:
+        img=np.vstack(
+                      (
+                       255*np.ones((N/2-nmid, img.shape[1])),
+                       img
+                       )
+                      )
+        img=np.delete(img,range(img.shape[0]+nmid-N/2,img.shape[0]),axis=0)
+    if mmid-M/2>0:
+        img=np.hstack(
+                      (
+                       img,
+                       255*np.ones((img.shape[0],mmid-M/2 ))
+                       )
+                      )
+        img=np.delete(img,range(mmid-N/2),axis=1)
+    elif M/2-mmid>0:
+        img=np.hstack(
+                      (
+                       255*np.ones((img.shape[0], M/2-mmid)),
+                       img
+                       )
+                      )
+        img=np.delete(img,range(img.shape[1]+mmid-M/2,img.shape[1]),axis=1)
+    
+    sobel_x=np.array([[1, 0, -1],[2, 0, -2],[1, 0, -1]])
+    sobel_y=np.array([[1, 2, 1],[0, 0, 0],[-1,-2,-1]])
+    par_x=convolve2d(valid,sobel_x,mode='same')
+    par_y=convolve2d(valid,sobel_y,mode='same')
+    Vy=2*np.sum(par_x*par_y)
+    Vx=np.sum(par_y**2-par_x**2)
+    # the direction of the foreground
+    theta=0.5*np.arctan2(Vy,Vx)    
+    # if theta is between 45 degree and -45 degree, then we think there would 
+    # be some problems calculating the direction.
+    if np.abs(theta)<np.pi/4:
+        return img
+    elif theta < -np.pi/4:
+        theta += np.pi
+    Matrix=cv2.getRotationMatrix2D((M/2,N/2),(np.pi/2-theta)*180/np.pi,1)    
+    img=cv2.warpAffine(img,Matrix,(M,N),borderValue=255)
+    return img
+ 
+def segmentation(img, blockSize=8, h=352, w=288):
+    add0=(16-img.shape[0]%16)/2
+    add1=(16-img.shape[1]%16)/2
+    img=np.vstack((  255*np.ones((add0,img.shape[1])), img, 255*np.ones((add0,img.shape[1]))  ))
+    img=np.hstack((  255*np.ones((img.shape[0],add1)), img, 255*np.ones((img.shape[0],add1))  ))
+    img=np.uint8(img)
+    ## reference: IMPROVED FINGERPRINT IMAGE SEGMENTATION USING NEW MODIFIED GRADIENT
+    #               BASED TECHNIQUE
+    sobel_x=np.array([[1, 0, -1],[2, 0, -2],[1, 0, -1]])
+    sobel_y=np.array([[1, 2, 1],[0, 0, 0],[-1,-2,-1]])
+    par_x=convolve2d(img,sobel_x,mode='same')
+    par_y=convolve2d(img,sobel_y,mode='same')
+    #img=basic.blockproc(img,cv2.equalizeHist,(blockSize,blockSize))
+    stdx=blockproc(par_x,np.std,(blockSize,blockSize),True)
+    stdy=blockproc(par_y,np.std,(blockSize,blockSize),True)
+    grddev=stdx+stdy
+    threshold=90
+    index=grddev[1:-1,1:-1].copy()
+    index[np.where(index<threshold)]=0
+    index[np.where(index>=threshold)]=1
+    a=np.zeros(grddev.shape)
+    a[1:-1,1:-1]=index
+    index=a
+          
+    valid=np.zeros(img.shape)
+    valid_b=block_view(valid,(blockSize,blockSize))
+    valid_b[:]=index[:,:,np.newaxis,np.newaxis]
+    
+    kernel = np.ones((8,8),np.uint8)
+    # first dilate to delete the invalid value inside the fingerprint region
+    valid=cv2.dilate(valid,kernel,iterations = 3)
+    # then erode more to delete the valid value outside the fingerprint region
+    valid=cv2.erode(valid, kernel, iterations = 10)
+    # dilate again to increase the valid value area in compensate for the lose
+    # due to erosion in the last step
+    valid=cv2.dilate(valid, kernel, iterations=5)
+
+    img[np.where(valid==0)]=255
+    # align the image    
+    #img=align(img, valid)         
+    return cut(img, valid, h, w)
+    
+def cut(img, valid, h=352,w=288):
     """segment an image into given size
     return: segmented image, segmented foreground
     """
-    imgfore=foreground(img)
-    index=np.where(imgfore==0)
+    index=np.where(valid==1)
     nmin=np.min(index[0]);nmax=np.max(index[0]);mmin=np.min(index[1]);mmax=np.max(index[1])
-    #midpoint=(np.array([(nmin+nmax)/2]),np.array([(mmin+mmax)/2]))
-    nmid=(nmin+nmax)/2;mmid=(mmin+mmax)/2
+    nmid,mmid=(nmin+nmax)/2,(mmin+mmax)/2
     a=nmid-h/2;b=nmid+h/2;c=mmid-w/2;d=mmid+w/2
     if (a<=0):
+        img=np.vstack( ( 
+                        255*np.ones((-a, img.shape[1]))
+                        ,img
+                        )
+                     )
+        valid=np.vstack( ( 
+                        np.zeros((-a, valid.shape[1]))
+                        ,valid
+                        )
+                     )
         a=0;b=h
     if (b>=img.shape[0]):
-        b=img.shape[0];a=b-h
+        img=np.vstack(
+                      (
+                       img,
+                       255*np.ones((b-img.shape[0], img.shape[1]))
+                       )
+                      )
+        valid=np.vstack(
+                      (
+                       valid,
+                       np.zeros((b-valid.shape[0], valid.shape[1]))
+                       )
+                      )
+        #b=img.shape[0];a=b-h
     if (c<=0):
+        img=np.hstack(
+                      (
+                       255*np.ones((img.shape[0],-c)),
+                       img
+                       )
+                      )
+        valid=np.hstack(
+                      (
+                       np.zeros((valid.shape[0],-c)),
+                       valid
+                       )
+                      )
         c=0;d=w
     if (d>=img.shape[1]):
-        d=img.shape[1];c=d-w
-    return img[a:b,c:d],imgfore[a:b,c:d]
+        img=np.hstack(
+                      (
+                       img,
+                       255*np.ones((img.shape[0],d-img.shape[1]))
+                       )
+                      )
+        valid=np.hstack(
+                      (
+                       valid,
+                       np.zeros((valid.shape[0],d-valid.shape[1]))
+                       )
+                      )
+        #d=img.shape[1];c=d-w
+    return img[a:b,c:d],valid[a:b,c:d]
 
-def calcDirection(img,blockSize):
+def calcDirection(img,blockSize,method='block-wise'):
     """calculate ridge directions in an image, using gradient method
     return: ridge directions
     """
@@ -82,20 +229,68 @@ def calcDirection(img,blockSize):
     par_x=convolve2d(img,sobel_x,mode='same')
     par_y=convolve2d(img,sobel_y,mode='same')
     N,M=np.shape(img)
-    Vx=np.zeros((N/blockSize,M/blockSize))
-    Vy=np.zeros((N/blockSize,M/blockSize))
-    for i in xrange(N/blockSize):
-        for j in xrange(M/blockSize):
-            a=i*blockSize;b=a+blockSize;c=j*blockSize;d=c+blockSize
-            Vy[i,j]=2*np.sum(par_x[a:b,c:d]*par_y[a:b,c:d])
-            Vx[i,j]=np.sum(par_y[a:b,c:d]**2-par_x[a:b,c:d]**2)
-    gaussianBlurSigma=2;    gaussian_block=5
+    if method=='block-wise':
+        Vx=np.zeros((N/blockSize,M/blockSize))
+        Vy=np.zeros((N/blockSize,M/blockSize))
+        for i in xrange(N/blockSize):
+            for j in xrange(M/blockSize):
+                a=i*blockSize;b=a+blockSize;c=j*blockSize;d=c+blockSize
+                Vy[i,j]=2*np.sum(par_x[a:b,c:d]*par_y[a:b,c:d])
+                Vx[i,j]=np.sum(par_y[a:b,c:d]**2-par_x[a:b,c:d]**2)
+        
+    elif method=='pixel-wise':
+        Vx,Vy=np.zeros((N,M)),np.zeros((N,M))
+        for i in xrange(blockSize/2,N-blockSize/2):
+            a=i-blockSize/2
+            b=a+blockSize
+            for j in xrange(blockSize/2,M-blockSize/2):
+                c=j-blockSize/2
+                d=c+blockSize
+                Vy[i,j]=2*np.sum(par_x[a:b,c:d]*par_y[a:b,c:d])
+                Vx[i,j]=np.sum(par_y[a:b,c:d]**2-par_x[a:b,c:d]**2)
+                
+    gaussianBlurSigma=2;
+    gaussian_block=5 if method=='block-wise' else 21
     Vy=cv2.GaussianBlur(Vy,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     Vx=cv2.GaussianBlur(Vx,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     theta=0.5*np.arctan2(Vy,Vx)            
     return theta
 
-
+def calcDirectionBox(img,blockSize=8,boxSize=4):
+    """calculate ridge directions in an image, using gradient method
+    return: ridge directions
+    """
+    sobel_x=np.array([[1, 0, -1],[2, 0, -2],[1, 0, -1]])
+    sobel_y=np.array([[1, 2, 1],[0, 0, 0],[-1,-2,-1]])
+    par_x=convolve2d(img,sobel_x,mode='same')
+    par_y=convolve2d(img,sobel_y,mode='same')
+    N,M=np.shape(img)
+    Vx=np.zeros((N/boxSize,M/boxSize))
+    Vy=np.zeros((N/boxSize,M/boxSize))
+    ii=-1
+    for i in xrange(blockSize/2,N-blockSize/2,boxSize):
+        ii += 1
+        if ii==N/boxSize:
+            break
+        a=i-blockSize/2
+        b=a+blockSize
+        jj=-1
+        for j in xrange(blockSize/2,M-blockSize/2,boxSize):
+            jj += 1
+            if jj==M/boxSize:
+                break
+            c=j-blockSize/2
+            d=c+blockSize
+            Vy[ii,jj]=2*np.sum(par_x[a:b,c:d]*par_y[a:b,c:d])
+            Vx[ii,jj]=np.sum(par_y[a:b,c:d]**2-par_x[a:b,c:d]**2)                
+    gaussianBlurSigma=2;
+    gaussian_block=5 
+    Vy=cv2.GaussianBlur(Vy,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
+    Vx=cv2.GaussianBlur(Vx,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
+    theta=0.5*np.arctan2(Vy,Vx)            
+    return theta    
+    
+    
 def blkWlDire(img):
     """Calculate wavelength and direction given an image block"""
     f=np.abs(fftshift(fft2(img)))
@@ -127,12 +322,37 @@ def calcWl(img,blockSize):
     wl=np.zeros((img.shape[0]/blockSize,img.shape[1]/blockSize))
     B=block_view(img,(blockSize,blockSize))
     for w,b in zip(wl,B):
-        w[:]=map(lambda b: blkwl(b),b)
+        w[:]=[blkwl(a) for a in b]
+        #w[:]=map(lambda b: blkwl(b),b)
     # Gaussian smoothing
     gaussianBlurSigma=4;    gaussian_block=7
     wl=cv2.GaussianBlur(wl,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     return wl
-    
+  
+def calcWlBox(img, blockSize, boxSize):
+    N,M=img.shape
+    wl=100*np.ones((img.shape[0]/boxSize,img.shape[1]/boxSize))    
+    ii=-1
+    for i in xrange(blockSize/2,N-blockSize/2,boxSize):
+        ii += 1
+        if ii>=N/boxSize:
+            break
+        a=i-blockSize/2
+        b=a+blockSize
+        jj=-1
+        for j in xrange(blockSize/2,M-blockSize/2,boxSize):
+            jj += 1
+            if jj>=M/boxSize:
+                break
+            c=j-blockSize/2
+            d=c+blockSize
+            wl[ii,jj]=blkwl(img[a:b,c:d])
+    gaussianBlurSigma=4;    gaussian_block=9
+    wl=cv2.GaussianBlur(wl,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
+    return wl
+        
+        
+        
 def GaborFilter_(img,blockSize,wl,dire,sigma=20):
     imgout=np.zeros_like(img)
     O=block_view(imgout,(blockSize,blockSize))
@@ -157,18 +377,54 @@ def GaborFilter(img,blockSize,wl,dire,sigma=20):
     kernel=np.zeros((img.shape[0]/blockSize*(blockSize+1),img.shape[1]/blockSize*(blockSize+1)))
     K=block_view(kernel,(blockSize+1,blockSize+1))
     for k,w,d in zip(K,wl,dire):
-        k[:,:]=np.asarray(map(lambda w,d: cv2.getGaborKernel((blockSize+1,blockSize+1),sigma,d,w,1),w,d))
+        k[:,:]=np.asarray(map(lambda w,d: cv2.getGaborKernel((blockSize+1,blockSize+1),sigma,d,w,1,0),w,d))
     for i in xrange(blockSize/2,img.shape[0]-blockSize/2):
         block_i=i/blockSize
         for j in xrange(blockSize/2,img.shape[1]-blockSize/2):
             block_j=j/blockSize
-            imgout[i,j]=np.sum(K[block_i,block_j][::-1,::-1]
+            imgout[i,j]=np.sum(K[block_i,block_j]
                         *img[i-blockSize/2:i+blockSize/2+1,j-blockSize/2:j+blockSize/2+1])
             
     imgout[np.where(imgout>255)]=255;imgout[np.where(imgout<0)]=0
     return imgout
             
+def GaborFilterBox(img,blockSize,boxSize,wl,dire,sigma=20):
+    """Gabor Filter
+    img: input image
+    blockSize: size of a block
+    wl: wavelength
+    dire: direction
+    return: filtered image
+    """
+    img=img.astype(np.float64)
+    N,M=img.shape
+    imgout=img.copy()
+    kernel=np.zeros((img.shape[0]/boxSize*(blockSize+1),img.shape[1]/boxSize*(blockSize+1)))
+    K=block_view(kernel,(blockSize+1,blockSize+1))
+    for k,w,d in zip(K,wl,dire):
+        k[:,:]=np.asarray(
+            [cv2.getGaborKernel((blockSize,blockSize),sigma, d_, w_, 1, 0  ) 
+                    for w_,d_ in zip(w,d)] )
+    
+    ii=-1
+    for i in xrange(blockSize/2,N-blockSize/2):
+        ii = (i-blockSize/2)/boxSize
+        if ii>=N/boxSize:
+            break
+        a=i-blockSize/2
+        b=a+blockSize+1
+        jj=-1
+        for j in xrange(blockSize/2,M-blockSize/2):
+            jj = (j-blockSize/2)/boxSize
+            if jj>=M/boxSize:
+                break
+            c=j-blockSize/2
+            d=c+blockSize+1
+            imgout[i,j]=np.sum( K[ii,jj][::-1,::-1]*img[a:b,c:d])
+    
+    imgout[np.where(imgout>255)]=255;imgout[np.where(imgout<0)]=0
 
+    return imgout
     
 def ridgeComp(img,theta, blockSize,w=3,h=9,alpha=100,beta=1):
     resize=5

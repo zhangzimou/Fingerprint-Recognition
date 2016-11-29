@@ -12,6 +12,8 @@ from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from scipy.signal import convolve2d
 import time
+import sys
+sys.path.append("..")
 from basic import imshow
 import basic
 from preprocess import enhance
@@ -20,7 +22,7 @@ from minutiaeExtract import minutiaeExtract
 
 
 start=time.clock()
-img_origin=cv2.imread('pic4.tif',0)
+img_origin=cv2.imread('../pic4.tif',0)
 img_origin,imgfore=pre.segmentation(img_origin)
 blockSize=16
 theta=pre.calcDirection(img_origin,blockSize)
@@ -37,6 +39,9 @@ end=time.clock()
 print end-start
 plt.figure()
 imshow(img_origin)
+N,M=img_origin.shape
+X,Y=np.mgrid[0:N:blockSize,0:M:blockSize]
+plt.quiver(Y,X,np.cos(theta),np.sin(theta),color='r')
 plt.figure()
 imshow(img_enhance)
 plt.figure()

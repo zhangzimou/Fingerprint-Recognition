@@ -17,7 +17,7 @@ from numpy.fft import ifft2
 from numpy.fft import fftshift
 from scipy.signal import convolve2d
 
-def block_view(A, block= (3, 3)):
+def block_view(A, block):
     """Provide a 2D block view to 2D array. No error checking made.
     Therefore meaningful (as implemented) only for blocks strictly
     compatible with the shape of A."""
@@ -38,9 +38,9 @@ def blockproc(M, fun, blk_size=(3,3),singleout=False):
     for b,o in zip(B, O):
         #o[:,:] = fun(b);
         if (singleout==False):
-            o[:,:]=np.asarray(map(lambda x:fun(x),b))
+            o[:,:]=np.asarray([ fun(a) for a in b ])
         else:
-            o[:]=np.asarray(map(lambda x:fun(x),b))
+            o[:]=np.asarray([ fun(a) for a in b ])
     return output
 
 

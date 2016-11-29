@@ -83,3 +83,49 @@ def bifurDirec(position,blockSize=15):
     for i in range(3):
         d[i]=np.sum(np.abs(theta[i]-np.delete(theta,i)))
     return theta[np.argmax(d)]
+                 
+                 
+def singular(img,imgfore):
+    """ Poincare Index method
+    img: enhanced image
+    imgfore: foreground image
+    return: core and delta position
+    """
+    blockSize=8
+    theta=pre.calcDirection(img,blockSize,method='block-wise')
+    P =[ theta[2:,1:-1], theta[2:,2:], theta[1:-1,2:], theta[:-2,2:], theta[:-2,1:-1],theta[:-2,:-2], theta[1:-1,:-2], theta[2:,:-2]]
+
+    N,M=img.shape
+    N1,M1=theta.shape
+    delta=np.zeros((N1-2,M1-2))
+    for i in range(8):
+        if i==7:
+            de=P[0]-P[7]
+        else:
+            de=P[i+1]-P[i]
+        de[np.where(de<=-np.pi/2)]+=np.pi
+        de[np.where(de>np.pi/2)]-=np.pi
+        delta+=de
+    delta /= 2*np.pi
+    delta_new=np.zeros(theta.shape)
+    delta_new[1:-1,1:-1]=delta
+    delta=delta_new
+    
+    delta_extend=np.zeros(img.shape)
+    delta_extend[::blockSize,::blockSize]=delta
+    # decrease the area of the foreground
+    imgfore=cv2.boxFilter(imgfore,-1,(29,29))
+    imgfore[np.where(imgfore>0)]=255
+    invalid=np.where(imgfore!=0)
+    # delete the singular outside the foreground
+    delta_extend[invalid]=0
+    # find core and delta position   
+    core_index=np.where((delta_extend<=0.55)*(delta_extend>=0.45))
+    delta_index=np.where((delta_extend<=-0.45)*(delta_extend>=-0.55))                 
+    return core_index, delta_index          
+                 
+                 
+                 
+                 
+                 
+                 
