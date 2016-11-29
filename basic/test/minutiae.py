@@ -6,8 +6,7 @@ Created on Mon Nov 28 12:02:15 2016
 @author: zhangzimou
 """
 
-import pyximport
-pyximport.install()
+
 
 import cv2
 import numpy as np

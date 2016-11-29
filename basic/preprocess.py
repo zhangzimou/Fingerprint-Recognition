@@ -28,19 +28,19 @@ from basic import block_view
 from basic import blockproc
 
 
-def enhance(img,blockSize=16):
+def enhance(img,blockSize=8,boxSize=4):
     """image enhancement
     return: enhanced image
     """
+    img=cv2.equalizeHist(np.uint8(img))
     img,imgfore=segmentation(img)
-    theta=calcDirection(img,blockSize)
-    wl=calcWl(img,blockSize)
-    #img=ridgeComp2(img,theta,blockSize)
+    img=blockproc(np.uint8(img),cv2.equalizeHist,(16,16))
+    theta=calcDirectionBox(img,blockSize,boxSize)
+    wl=calcWlBox(img,blockSize,boxSize)
+    # 255-img: inverse
+    img=GaborFilterBox(255-img,blockSize,boxSize,wl,np.pi/2-theta)
     # inverse
     img=255-img
-    img=GaborFilter(img,blockSize,wl,np.pi/2-theta)
-    # inverse
-#    img=255-img
     img[np.where(imgfore==0)]=255
     return img
 
@@ -312,8 +312,10 @@ def calcWlDire(img,blockSize):
 def blkwl(img):
     """Calculate wavelength  given an image block"""
     f=np.abs(fftshift(fft2(img)))
-    origin=np.where(f==np.max(f));f[origin]=0;mmax=np.where(f==np.max(f))
-    wl=2*img.shape[0]/(((origin[0]-mmax[0][0])*2)**2+((origin[1]-mmax[1][0])*2)**2)**0.5
+    origin=np.where(f==np.max(f))
+    f[origin]=0
+    mmax=np.where(f==np.max(f))
+    wl=2*img.shape[0]/(((origin[0][0]-mmax[0][0])*2)**2+((origin[1][0]-mmax[1][0])*2)**2)**0.5
     return wl
 
 def calcWl(img,blockSize):

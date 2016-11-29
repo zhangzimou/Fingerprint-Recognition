@@ -24,15 +24,17 @@ from basic import block_view
 FVC0='/home/zhangzimou/Desktop/code_lnk/database/FVC2000/'
 FVC2='/home/zhangzimou/Desktop/code_lnk/database/FVC2002/'
 FVC4='/home/zhangzimou/Desktop/code_lnk/database/FVC2004/'
-path=FVC4+'DB1_B/'
+path=FVC4+'DB2_B/'
 
 start=time.clock()
 
 blockSize=8
 boxSize=8
-img=cv2.imread(path+'106_1.tif',0)
+img=cv2.imread(path+'108_1.tif',0)
 
 img,imgfore=pre.segmentation(img)
+
+img=basic.blockproc(np.uint8(img),cv2.equalizeHist,(16,16))
 theta=pre.calcDirectionBox(img,blockSize,boxSize)
 wl=pre.calcWlBox(img,blockSize,boxSize)
 

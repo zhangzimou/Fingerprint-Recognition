@@ -8,6 +8,7 @@ Created on Sun Nov 20 15:12:33 2016
 functions for minutiae extraction
     minutiae extraction
     minutiae validation and minutiae direction calculation
+    singular points extraction
 """
 
 import cv2
@@ -38,9 +39,9 @@ def minutiaeExtract(img,imgfore):
     ending=np.asarray((valid[0][ending_index]+1,valid[1][ending_index]+1))
     bifur=np.asarray((valid[0][bifur_index]+1,valid[1][bifur_index]+1))
     #delete minutiae near the edge of the foreground
-    imgfored=cv2.boxFilter(imgfore,-1,(9,9))
-    imgfored[np.where(imgfored>0)]=255
-    edge1,edge2=np.where(imgfored[ending[0],ending[1]]==255),np.where(imgfored[bifur[0],bifur[1]]==255)
+    kernel = np.ones((8,8),np.uint8)
+    imgfore=cv2.erode(imgfore,kernel,iterations=4)
+    edge1,edge2=np.where(imgfore[ending[0],ending[1]]==0),np.where(imgfore[bifur[0],bifur[1]]==0)
     ending=np.delete(ending.T,edge1[0],0)
     bifur=np.delete(bifur.T,edge2[0],0)
     #delete minutiae near the edge of the image
@@ -51,14 +52,14 @@ def minutiaeExtract(img,imgfore):
     valid1=(bifur[:,0]>=edgeDistance) * (bifur[:,0]<=img.shape[0]-edgeDistance)
     valid2=(bifur[:,1]>=edgeDistance) * (bifur[:,1]<=img.shape[1]-edgeDistance)
     bifur=bifur[np.where(valid1 * valid2)]              
-    #valide minutiae and calculate directions at the same time
+    #validate minutiae and calculate directions at the same time
     ending,theta1=validateMinutiae(image,ending,1)
     bifur,theta2=validateMinutiae(image,bifur,0)
     return ending,bifur,theta1,theta2
 
 
 
-def validateMinutiae(imgB,minutiae,ifending,blockSize=15):
+def validateMinutiae(imgB,minutiae,ifending,blockSize=21):
     """validate minutiae, and calculate directions at the same
     return: validated minutiae, directions of minutiae
     """
@@ -75,7 +76,7 @@ def validateMinutiae(imgB,minutiae,ifending,blockSize=15):
     else:
         valid=np.where(CN==3)
         position=position[valid]
-        theta=np.asarray(map(lambda x:bifurDirec(x),position))        
+        theta=np.asarray(map(bifurDirec,position))        
         return minutiae[valid],theta
 def bifurDirec(position,blockSize=15):
     theta=np.arctan2(blockSize/2-position[:,0],blockSize/2-position[:,1])
