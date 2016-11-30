@@ -144,9 +144,9 @@ def segmentation(img, blockSize=8, h=352, w=288):
     
     kernel = np.ones((8,8),np.uint8)
     # first dilate to delete the invalid value inside the fingerprint region
-    valid=cv2.dilate(valid,kernel,iterations = 3)
+    valid=cv2.dilate(valid,kernel,iterations = 5)
     # then erode more to delete the valid value outside the fingerprint region
-    valid=cv2.erode(valid, kernel, iterations = 10)
+    valid=cv2.erode(valid, kernel, iterations = 12)
     # dilate again to increase the valid value area in compensate for the lose
     # due to erosion in the last step
     valid=cv2.dilate(valid, kernel, iterations=5)
@@ -422,7 +422,7 @@ def GaborFilterBox(img,blockSize,boxSize,wl,dire,sigma=20):
                 break
             c=j-blockSize/2
             d=c+blockSize+1
-            imgout[i,j]=np.sum( K[ii,jj][::-1,::-1]*img[a:b,c:d])
+            imgout[i,j]=np.sum( K[ii,jj]*img[a:b,c:d])
     
     imgout[np.where(imgout>255)]=255;imgout[np.where(imgout<0)]=0
 

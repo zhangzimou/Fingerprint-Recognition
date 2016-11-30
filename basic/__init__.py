@@ -26,7 +26,7 @@ from match import minutiaeMatch
 start=time.clock()
 
 #open all images in source and store all filenames for search afterwards
-path = 'D:/Grogia Tech/Digital Image processing/Project/Demo/new/basic/test/FVC2004/DB1_B'
+path = '/home/zhangzimou/Desktop/code_lnk/database/FVC2004/DB1_B'
 filename = [1]*80 #ten different fingerprints. eight images for same fingerprint
 count = 0
 for file in os.listdir(path):
