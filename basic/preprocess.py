@@ -26,22 +26,27 @@ from numpy.fft import fftshift
 from scipy.signal import convolve2d
 from basic import block_view
 from basic import blockproc
+import basic
 
 
 def enhance(img,blockSize=8,boxSize=4):
     """image enhancement
     return: enhanced image
     """
-    img=cv2.equalizeHist(np.uint8(img))
+#    img=cv2.equalizeHist(np.uint8(img))
     img,imgfore=segmentation(img)
-    img=blockproc(np.uint8(img),cv2.equalizeHist,(16,16))
+#    img=blockproc(np.uint8(img),cv2.equalizeHist,(16,16))
     theta=calcDirectionBox(img,blockSize,boxSize)
     wl=calcWlBox(img,blockSize,boxSize)
-    # 255-img: inverse
-    img=GaborFilterBox(255-img,blockSize,boxSize,wl,np.pi/2-theta)
-    # inverse
-    img=255-img
+    
+    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    
     img[np.where(imgfore==0)]=255
+    img=basic.truncate(img,method='part')
+    
     return img
 
  
@@ -149,7 +154,7 @@ def segmentation(img, blockSize=8, h=352, w=288):
     valid=cv2.erode(valid, kernel, iterations = 12)
     # dilate again to increase the valid value area in compensate for the lose
     # due to erosion in the last step
-    valid=cv2.dilate(valid, kernel, iterations=5)
+    valid=cv2.dilate(valid, kernel, iterations=7)
 
     img[np.where(valid==0)]=255
     # align the image    
@@ -284,7 +289,7 @@ def calcDirectionBox(img,blockSize=8,boxSize=4):
             Vy[ii,jj]=2*np.sum(par_x[a:b,c:d]*par_y[a:b,c:d])
             Vx[ii,jj]=np.sum(par_y[a:b,c:d]**2-par_x[a:b,c:d]**2)                
     gaussianBlurSigma=2;
-    gaussian_block=5 
+    gaussian_block=9 
     Vy=cv2.GaussianBlur(Vy,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     Vx=cv2.GaussianBlur(Vx,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     theta=0.5*np.arctan2(Vy,Vx)            
@@ -327,11 +332,15 @@ def calcWl(img,blockSize):
         w[:]=[blkwl(a) for a in b]
         #w[:]=map(lambda b: blkwl(b),b)
     # Gaussian smoothing
-    gaussianBlurSigma=4;    gaussian_block=7
+    gaussianBlurSigma=4;    gaussian_block=9
     wl=cv2.GaussianBlur(wl,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     return wl
   
 def calcWlBox(img, blockSize, boxSize):
+    resize=5
+    img=cv2.resize(img,None,fx=resize,fy=resize,interpolation = cv2.INTER_CUBIC)
+    blockSize=blockSize*resize
+    boxSize=boxSize*resize
     N,M=img.shape
     wl=100*np.ones((img.shape[0]/boxSize,img.shape[1]/boxSize))    
     ii=-1
@@ -351,7 +360,7 @@ def calcWlBox(img, blockSize, boxSize):
             wl[ii,jj]=blkwl(img[a:b,c:d])
     gaussianBlurSigma=4;    gaussian_block=9
     wl=cv2.GaussianBlur(wl,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
-    return wl
+    return wl/resize
         
         
         
@@ -415,6 +424,7 @@ def GaborFilterBox(img,blockSize,boxSize,wl,dire,sigma=20):
             break
         a=i-blockSize/2
         b=a+blockSize+1
+        img0=img[a:b]
         jj=-1
         for j in xrange(blockSize/2,M-blockSize/2):
             jj = (j-blockSize/2)/boxSize
@@ -422,32 +432,14 @@ def GaborFilterBox(img,blockSize,boxSize,wl,dire,sigma=20):
                 break
             c=j-blockSize/2
             d=c+blockSize+1
-            imgout[i,j]=np.sum( K[ii,jj]*img[a:b,c:d])
+            imgout[i,j]=np.sum( K[ii,jj]*img0[:,c:d])
     
-    imgout[np.where(imgout>255)]=255;imgout[np.where(imgout<0)]=0
+#    imgout[np.where(imgout>255)]=255;imgout[np.where(imgout<0)]=0
 
     return imgout
     
-def ridgeComp(img,theta, blockSize,w=3,h=9,alpha=100,beta=1):
-    resize=5
-    N,M=np.shape(img)
-    imgout=np.zeros_like(img)
-    imgresizeize=cv2.resizeize(img,None,fx=resize,fy=resize,interpolation = cv2.INTER_CUBIC)
-    mask=np.ones((w,h))*beta
-    mask[(w-1)/2]=np.ones((1,h))*alpha
-    ww=np.arange(-(w-1)/2,(w-1)/2+1)
-    hh=np.arange(-(h-1)/2,(h-1)/2+1)
-    hh,ww=np.meshgrid(hh,ww)
-    for i in xrange((h-1)/2,N-(h-1)/2):
-        block_i=i/blockSize
-        for j in xrange((h-1)/2,M-(h-1)/2):
-            block_j=j/blockSize
-            thetaHere=theta[block_i,block_j]
-            ii=np.round((i+ww*np.cos(thetaHere)-hh*np.sin(thetaHere))*resize).astype(np.int32)
-            jj=np.round((j+ww*np.sin(thetaHere)+hh*np.cos(thetaHere))*resize).astype(np.int32)
-            imgout[i,j]=np.sum(imgresizeize[ii,jj]*mask)/(((w-1)*beta+alpha)*h)
 
-def ridgeComp2(img,theta,blockSize,h=15):
+def ridgeComp2(img,theta,blockSize,h=9):
     resize=5
     N,M=np.shape(img)
     imgout=img.copy()
@@ -463,6 +455,26 @@ def ridgeComp2(img,theta,blockSize,h=15):
             imgout[i,j]=np.mean(imgresize[ii,jj])
     return imgout
 
+def ridgeComp(img,theta,blockSize,boxSize,h=11):
+    resize=8
+    N,M=np.shape(img)
+    imgout=img.copy()
+    imgResize=cv2.resize(img,None,fx=resize,fy=resize,interpolation = cv2.INTER_CUBIC)
+    hh=np.arange(-(h-1)/2,(h-1)/2+1)
+    for i in xrange(10,N-10):
+        block_i = (i-blockSize/2)/boxSize
+        if block_i>=theta.shape[0]:
+            break
+        for j in xrange(10,M-10):
+            block_j = (j-blockSize/2)/boxSize
+            if block_j>=theta.shape[1]:
+                break
+            theta0=theta[block_i,block_j]
+            ii=np.round((i-hh*np.sin(theta0))*resize).astype(np.int32)
+            jj=np.round((j+hh*np.cos(theta0))*resize).astype(np.int32)
+            imgout[i,j]=np.mean(imgResize[ii,jj])
+    return imgout    
+    
 def fill(img,position,ifending=1,newvalue=2):
     image=img.copy()
     N=image.shape[0]

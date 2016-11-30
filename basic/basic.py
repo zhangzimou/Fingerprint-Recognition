@@ -73,7 +73,20 @@ def binarize(img,reverse=1):
     imgout[np.where(img<=np.mean(img))]=1 if (reverse) else 0
     return imgout
 
-
+def truncate(img, method='default'):
+    image=img.copy()
+    if method == 'default':
+        image[np.where(img>255)]=255
+        image[np.where(img<0)]=0
+    elif method == 'mean':
+        image[np.where(img>=np.mean(img))]=255
+        image[np.where(img<np.mean(img))]=0
+    elif method == 'part':
+        index=np.where(image!=255)
+        image[index]=truncate(image[index],method='mean')
+    elif method == '0':
+        return image
+    return image
     
 def imshow(img):
     plt.imshow(img,cmap='gray',vmin=0,vmax=255,interpolation='nearest')
@@ -82,7 +95,21 @@ def normalize(img):
     a=np.max(img)
     b=np.min(img)
     return (img-b)*255.0/(a-b)
-def normalize2(img,mu=125,sigma=128):
+    
+def normalizeBox(img,blockSize,boxSize,mu=125,sigma=500):
+    image=img.copy()
+    N,M=img.shape
+    for i in xrange(blockSize/2,N-blockSize/2-boxSize,boxSize):
+        a=i-blockSize/2
+        b=a+blockSize+boxSize
+        for j in xrange(blockSize/2,M-blockSize/2-boxSize,boxSize):
+            c=j-blockSize/2
+            d=c+blockSize+boxSize
+            image[i:i+boxSize,j:j+boxSize]=normalize2(img[a:b,c:d],mu,sigma)            [blockSize/2:blockSize/2+boxSize,blockSize/2:blockSize/2+boxSize]
+    return image    
+    
+    
+def normalize2(img,mu=125,sigma=1000):
     m=np.mean(img)
     std=np.std(img)
     if (std==0):

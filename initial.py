@@ -123,7 +123,7 @@ def calcWl(img,blockSize):
     B=block_view(img,(blockSize,blockSize))
     for w,b in zip(wl,B):
         w[:]=map(lambda b: blkwl(b),b)
-    gaussianBlurSigma=4;    gaussian_block=7
+    gaussianBlurSigma=5;    gaussian_block=21
     wl=cv2.GaussianBlur(wl,(gaussian_block,gaussian_block),gaussianBlurSigma,gaussianBlurSigma)
     return wl
     
@@ -146,7 +146,7 @@ def GaborFilter(img,blockSize,wl,dire,sigma=20):
     kernel=np.zeros((img.shape[0]/blockSize*(blockSize+1),img.shape[1]/blockSize*(blockSize+1)))
     K=block_view(kernel,(blockSize+1,blockSize+1))
     for k,w,d in zip(K,wl,dire):
-        k[:,:]=np.asarray(map(lambda w,d: cv2.getGaborKernel((blockSize+1,blockSize+1),sigma,d,w,1),w,d))
+        k[:,:]=np.asarray(map(lambda w,d: cv2.getGaborKernel((blockSize+1,blockSize+1),sigma,d,w,1,0),w,d))
     for i in xrange(blockSize/2,img.shape[0]-blockSize/2):
         block_i=i/blockSize
         for j in xrange(blockSize/2,img.shape[1]-blockSize/2):
