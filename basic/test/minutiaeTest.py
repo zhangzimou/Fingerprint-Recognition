@@ -26,25 +26,22 @@ from basic import block_view
 FVC0='/home/zhangzimou/Desktop/code_lnk/database/FVC2000/'
 FVC2='/home/zhangzimou/Desktop/code_lnk/database/FVC2002/'
 FVC4='/home/zhangzimou/Desktop/code_lnk/database/FVC2004/'
-path=FVC2+'DB1_B/'
+path=FVC4+'DB1_B/'
 
 blockSize=8
 
-img=cv2.imread(path+'101_1.tif',0)
-
-img_seg,imgfore=pre.segmentation(img)
+img=cv2.imread(path+'101_3.tif',0)
 
 
 
-
-img_en=enhance(img)
-imgB=basic.binarize(img_en)
+imgE,imgfore=enhance(img)
+imgB=basic.binarize(imgE)
 imgT=pre.thinning(imgB)
 
+#plt.figure()
+#imshow(img)
 plt.figure()
-imshow(img_seg)
-plt.figure()
-plt.imshow(img_en,cmap='gray')
+plt.imshow(imgE,cmap='gray')
 plt.figure()
 plt.imshow(imgT,cmap='gray')
 

@@ -15,6 +15,8 @@ functions for preprocessing:
     thinning
     count cross number(CN)
 """
+import pyximport
+pyximport.install()
 
 import cv2
 from matplotlib import pyplot as plt
@@ -28,6 +30,7 @@ from basic import block_view
 from basic import blockproc
 import basic
 
+import _preprocess as _pre
 
 def enhance(img,blockSize=8,boxSize=4):
     """image enhancement
@@ -36,18 +39,22 @@ def enhance(img,blockSize=8,boxSize=4):
 #    img=cv2.equalizeHist(np.uint8(img))
     img,imgfore=segmentation(img)
 #    img=blockproc(np.uint8(img),cv2.equalizeHist,(16,16))
-    theta=calcDirectionBox(img,blockSize,boxSize)
+    img=img.copy(order='C').astype(np.float64)
+    theta=_pre.calcDirectionBox(img,blockSize,boxSize)
     wl=calcWlBox(img,blockSize,boxSize)
     
-    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
     
+    img=np.asarray(img)
+    imgfore=cv2.erode(imgfore,np.ones((8,8)),iterations=4)
     img[np.where(imgfore==0)]=255
-    img=basic.truncate(img,method='part')
+    img=basic.truncate(img,method='default')
     
-    return img
+    return img,imgfore
 
  
 def foreground(img,blockSize=31):
@@ -124,7 +131,7 @@ def segmentation(img, blockSize=8, h=352, w=288):
     add1=(16-img.shape[1]%16)/2
     img=np.vstack((  255*np.ones((add0,img.shape[1])), img, 255*np.ones((add0,img.shape[1]))  ))
     img=np.hstack((  255*np.ones((img.shape[0],add1)), img, 255*np.ones((img.shape[0],add1))  ))
-    img=np.uint8(img)
+#    img=np.uint8(img)
     ## reference: IMPROVED FINGERPRINT IMAGE SEGMENTATION USING NEW MODIFIED GRADIENT
     #               BASED TECHNIQUE
     sobel_x=np.array([[1, 0, -1],[2, 0, -2],[1, 0, -1]])
@@ -132,8 +139,8 @@ def segmentation(img, blockSize=8, h=352, w=288):
     par_x=convolve2d(img,sobel_x,mode='same')
     par_y=convolve2d(img,sobel_y,mode='same')
     #img=basic.blockproc(img,cv2.equalizeHist,(blockSize,blockSize))
-    stdx=blockproc(par_x,np.std,(blockSize,blockSize),True)
-    stdy=blockproc(par_y,np.std,(blockSize,blockSize),True)
+    stdx=blockproc(par_x,np.std,(16,16),True)
+    stdy=blockproc(par_y,np.std,(16,16),True)
     grddev=stdx+stdy
     threshold=90
     index=grddev[1:-1,1:-1].copy()
@@ -144,7 +151,7 @@ def segmentation(img, blockSize=8, h=352, w=288):
     index=a
           
     valid=np.zeros(img.shape)
-    valid_b=block_view(valid,(blockSize,blockSize))
+    valid_b=block_view(valid,(16,16))
     valid_b[:]=index[:,:,np.newaxis,np.newaxis]
     
     kernel = np.ones((8,8),np.uint8)

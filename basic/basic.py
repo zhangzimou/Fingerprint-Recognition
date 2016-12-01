@@ -84,8 +84,9 @@ def truncate(img, method='default'):
     elif method == 'part':
         index=np.where(image!=255)
         image[index]=truncate(image[index],method='mean')
-    elif method == '0':
+    elif method == 'original':
         return image
+    
     return image
     
 def imshow(img):
