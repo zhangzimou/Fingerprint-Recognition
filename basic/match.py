@@ -35,11 +35,24 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI,):
 	# theta1I = np.array(theta1I.tolist()+theta2I.tolist())
 	lengthT = len(endingT) #n
 	lengthI = len(endingI)
+	length2T = len(bifurT) #bifur
+	length2I = len(bifurI)
+	if lengthI>lengthT:
+		endingI,endingT = endingT,endingI
+		theta1I,theta1T = theta1T,theta1I
+		lengthI,lengthT = lengthT,lengthI
+	if length2I>length2T:
+		bifurI,bifurT = bifurT,bifurI
+		theta2I,theta2T = theta2T,theta2I
+		length2I,length2T = length2T,length2I
 	closest1T_r = [[1,1]]*3
 	closest1I_r = [[1,1]]*3
+	closest2T_r = [[1,1]]*3
+	closest2I_r = [[1,1]]*3
 	dis = [0]*lengthI
 	corresPoint = np.zeros([lengthT,5,2])
-
+	dis2 = [0]*length2I
+	corresPoint2 = np.zeros([length2T,5,2])
 	#finding correspondences
 	for i in range(0,lengthT):
 		for j in range(0,lengthI):
@@ -53,49 +66,91 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI,):
 		dis_temp.sort()
 		for n in range(0,5):
 			corresPoint[i][n] = endingI[dis.index(dis_temp[n])]
-
-
+	bifurFlag = 0
+	if length2T>=5 and length2I>=5:
+		bifurFlag = 1
+		for i in range(0,length2T):
+			for j in range(0,length2I):
+				closest2T = findThreeClosest(bifurT[i][0],bifurT[i][1],bifurT)
+				closest2I = findThreeClosest(bifurI[j][0],bifurI[j][1],bifurI)
+				for n in range(0,3):
+					closest2T_r[n] = rotate(bifurT[i][0],bifurT[i][1],closest2T[n][0],closest2T[n][1],theta2T[i])
+					closest2I_r[n] = rotate(bifurI[j][0],bifurI[j][1],closest2I[n][0],closest2I[n][1],theta2I[j])
+				dis2[j] = minDistance(closest2T_r,closest2I_r)
+			dis_temp2 = copy.deepcopy(dis2)
+			dis_temp2.sort()
+			for n in range(0,5):
+				corresPoint2[i][n] = bifurI[dis2.index(dis_temp2[n])]
 	#RANSAC algorithm
-	iterations = 600
-	iteration = 1
-	requiredPoints = math.sqrt(lengthT*lengthI)/2 #number of matching points required to assert that the transformation fits well
-	# print "Required matching points: %d" % requiredPoints
+	iterations = 2000
 	matchedPoints_max = 0
-	R0 = 30 #threshold for sd
-	sigma0 = 20/180 #threshold for dd
+	matchedPoints_max2 = 0
+	R0 = 20 #threshold for sd
+	sigma0 = 10*math.pi/180 #threshold for dd
 	from_pt = [[0,0]]*3
-	random.seed(10)
-	for iteration in range(1,iterations+1):
-		# print "iteration %d" % iteration
+	from_pt2 = [[0,0]]*3
+	for iteration in range(iterations):
 		#take three random points in the template and input set
+		# print iteration
+		find = 0
 		to_pt = [[1,1]]*3
+		to_pt2 = [[1,1]]*3
+		indexT = [random.randint(0,lengthT-1) for _ in range(3)]
+		indexI = [random.randint(0,4) for _ in range(3)]
+		index2T = [random.randint(0,length2T-1) for _ in range(3)]
 		for n in range(3):
-			indexT = int(random.random()*lengthT)
-			indexI = int(random.random()*5)
-			from_pt[n] = endingT[indexT] #random thre points of template set
-			to_pt[n] = corresPoint[indexT][indexI]
-			if (to_pt[0][0]==to_pt[1][0] and to_pt[0][1]==to_pt[1][1]) or (to_pt[1][0]==to_pt[2][0] and to_pt[1][1]==to_pt[2][1]) or (to_pt[0][0]==to_pt[2][0] and to_pt[0][1]==to_pt[2][1]):
+			from_pt[n] = endingT[indexT[n]] #random thre points of template set
+			to_pt[n] = corresPoint[indexT[n]][indexI[n]]
+			from_pt2[n] = bifurT[index2T[n]] #random thre points of template set
+			to_pt2[n] = corresPoint2[index2T[n]][indexI[n]]
+		if (to_pt[0][0]==to_pt[1][0] and to_pt[0][1]==to_pt[1][1]) or (to_pt[1][0]==to_pt[2][0] and to_pt[1][1]==to_pt[2][1]) or (to_pt[0][0]==to_pt[2][0] and to_pt[0][1]==to_pt[2][1]):
+			continue
+		if bifurFlag==1:
+			if (to_pt2[0][0]==to_pt2[1][0] and to_pt2[0][1]==to_pt2[1][1]) or (to_pt2[1][0]==to_pt2[2][0] and to_pt2[1][1]==to_pt2[2][1]) or (to_pt2[0][0]==to_pt2[2][0] and to_pt2[0][1]==to_pt2[2][1]):
 				continue
 		#find affine tranformation
 		flag,matrix_a = affineParameters(from_pt, to_pt)
-		if flag == 0:
+		flag2,matrix_a2 = affineParameters(from_pt2, to_pt2)
+		if flag==0 or flag2==0:
 			continue
 		#apply the transformation to the all template points
 		newT = [[0,0]]*lengthT
 		for i in range(0,lengthT):
-			newT[i] = affineCalculate(endingT[i],matrix_a)        	
+			newT[i] = affineCalculate(endingT[i],matrix_a)      
+		new2T = [[0,0]]*length2T
+		if bifurFlag==1:
+			for i in range(0,length2T):
+				new2T[i] = affineCalculate(bifurT[i],matrix_a2)    	
 		#count number of match points
-		d = 0 #count of matched points
+		d1 = 0 #count of matched points
 		for i in range(0,lengthT):
 			for j in range(0,lengthI):
-				sd = pow(newT[i][0]-endingI[j][0],2)+pow(newT[i][1]-endingI[j][1],2)
-				dd = min(abs(theta1T[i]-theta1I[j]),1-abs(theta1T[i]-theta1I[j]))
+				sd = math.sqrt(pow(newT[i][0]-endingI[j][0],2)+pow(newT[i][1]-endingI[j][1],2))
+				dd = min(abs(theta1T[i]-theta1I[j]),2*math.pi-abs(theta1T[i]-theta1I[j]))
+				# print sd,dd
 				if sd <= R0 and dd <= sigma0:
-					d += 1
-		if d > matchedPoints_max:
-			matchedPoints_max = d
+					d1 += 1
+		if d1 > matchedPoints_max:
+			matchedPoints_max = d1
+		d2 = 0 #count of matched points
+		if bifurFlag==1:
+			for i in range(0,length2T):
+				for j in range(0,length2I):
+					sd = math.sqrt(pow(new2T[i][0]-bifurI[j][0],2)+pow(new2T[i][1]-bifurI[j][1],2))
+					dd = min(abs(theta2T[i]-theta2I[j]),2*math.pi-abs(theta2T[i]-theta2I[j]))
+					# print sd,dd
+					if sd <= R0 and dd <= sigma0:
+						d2 += 1
+			if d2 > matchedPoints_max2:
+				matchedPoints_max2 = d2
 		# print  d1+d2
-	return matchedPoints_max
+	print matchedPoints_max,matchedPoints_max2
+	print lengthT,length2T
+	if bifurFlag==1:
+		score = (float(matchedPoints_max)/lengthT + float(matchedPoints_max2)/length2T)/2
+	else:
+		score = float(matchedPoints_max)/lengthT
+	return matchedPoints_max+matchedPoints_max2,score
 
 
 def findThreeClosest(x,y,minutiaePoints):
@@ -134,8 +189,8 @@ def rotate(originx,originy,pointx,pointy,angle):
 	"""
 	Rotate a point cunterclockwise by a given angle around a given origin.
 	"""
-	qx=originx+math.cos(angle*180)*(pointx-originx)-math.sin(angle*180)*(pointy-originy)
-	qy=originx+math.sin(angle*180)*(pointx-originx)+math.cos(angle*180)*(pointy-originy)
+	qx=originx+math.cos(angle*180/math.pi)*(pointx-originx)-math.sin(angle*180/math.pi)*(pointy-originy)
+	qy=originx+math.sin(angle*180/math.pi)*(pointx-originx)+math.cos(angle*180/math.pi)*(pointy-originy)
 	return qx,qy
 
 def minDistance(closest1T_r,closest1I_r):
