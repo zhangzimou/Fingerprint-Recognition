@@ -30,7 +30,7 @@ path=FVC4+'DB1_B/'
 blockSize=8
 
 img1=cv2.imread(path+'101_3.tif',0)
-img2=cv2.imread(path+'102_6.tif',0)
+img2=cv2.imread(path+'101_6.tif',0)
 
 img_seg1,imgfore1=pre.segmentation(img1)
 img_seg2,imgfore2=pre.segmentation(img2)

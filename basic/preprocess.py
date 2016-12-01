@@ -15,8 +15,8 @@ functions for preprocessing:
     thinning
     count cross number(CN)
 """
-import pyximport
-pyximport.install()
+#import pyximport
+#pyximport.install()
 
 import cv2
 from matplotlib import pyplot as plt
