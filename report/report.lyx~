@@ -1,0 +1,1375 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass IEEEtran
+\use_default_options true
+\begin_modules
+logicalmkup
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding utf8-plain
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts true
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 1
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref true
+\pdf_title "The LyX Tutorial"
+\pdf_author "LyX Team"
+\pdf_subject "LyX-documentation Tutorial"
+\pdf_keywords "LyX, documentation"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered true
+\pdf_bookmarksopen true
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle false
+\pdf_quoted_options "linkcolor=black, citecolor=black, urlcolor=blue, filecolor=blue,pdfpagelayout=OneColumn, pdfnewwindow=true, pdfstartview=XYZ, plainpages=false"
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 5
+\tocdepth 5
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Fingerprint Recognition
+\end_layout
+
+\begin_layout Author
+Wenxin Fang, Zimou Zhang
+\end_layout
+
+\begin_layout Abstract
+abstract
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Fingerprints are one of the most common and trusted biometrics for personal
+ identification.
+ Because of their uniqueness and consistency over time, fingerprints have
+ been used for identification for over a century.
+ Fingerprint identification is popular because of the inherent ease in acquisiti
+on, the numerous sources available for collection, and their established
+ use and collections by law enforcement and immigration.
+\end_layout
+
+\begin_layout Standard
+In this paper, we propose a system 
+\end_layout
+
+\begin_layout Section
+Fingerprint Segmentation
+\end_layout
+
+\begin_layout Standard
+An important step in fingerprint recognition is the segmentation of the
+ region of interest (ROI).
+ The objective of fingerprint segmentation is to extract the ROI which contains
+ the desired fingerprint impression.
+\end_layout
+
+\begin_layout Standard
+In our fingerprint recognition, we use modified gradient based method proposed
+ in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "akram2008improved"
+
+\end_inset
+
+.Steps for this method are summarized as follows:
+\end_layout
+
+\begin_layout Enumerate
+Divide the input image 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+ into non-overlapping blocks with size 
+\begin_inset Formula $w\times w$
+\end_inset
+
+.
+ In our implementation, we use 
+\begin_inset Formula $w=8$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Use histogram equalization to enhance the contrast of each block.
+\end_layout
+
+\begin_layout Enumerate
+Compute the gradient 
+\begin_inset Formula $\partial_{x}(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $\partial_{y}(i,j)$
+\end_inset
+
+ at each pixel (i,j) which is the center of the block.
+\end_layout
+
+\begin_layout Enumerate
+Compute the standard deviation for both both 
+\begin_inset Formula $\partial_{x}(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $\partial_{y}(i,j)$
+\end_inset
+
+ using equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:stdx"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:stdx-1"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\text{std}_{x}=\sqrt{\frac{1}{w^{2}}\sum_{i=-w/2}^{w/2}\sum_{j=-w/2}^{w/2}(\partial_{x}(i,j)-M_{x}(I))^{2}}\label{eq:stdx}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\text{std}_{y}=\sqrt{\frac{1}{w^{2}}\sum_{i=-w/2}^{w/2}\sum_{j=-w/2}^{w/2}(\partial_{y}(i,j)-M_{y}(I))^{2}}\label{eq:stdx-1}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $M_{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $M_{y}$
+\end_inset
+
+ are the mean values of 
+\begin_inset Formula $\partial_{x}(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $\partial_{y}(i,j)$
+\end_inset
+
+ for each block.
+\end_layout
+
+\begin_layout Enumerate
+Compute the gradient deviation using equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:grddev"
+
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{equation}
+\text{grddev}=\text{std}_{x}+\text{std}_{y}\label{eq:grddev}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Select a threshold value empirically.
+ If grddev is greater than threshold value, the block is considered as foregroun
+d otherwise it belongs to background.
+\end_layout
+
+\begin_layout Section
+Fingerprint Enhancement
+\end_layout
+
+\begin_layout Subsection
+Orientation Estimation
+\end_layout
+
+\begin_layout Standard
+We use gradient based orientation estimation method in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "hong1998fingerprint"
+
+\end_inset
+
+.
+ Given an image 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+, the main steps of the algorithm are as follows:
+\end_layout
+
+\begin_layout Enumerate
+Divide 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+ into blocks of size 
+\begin_inset Formula $w\times w$
+\end_inset
+
+.
+ In our implementation, we choose
+\begin_inset Formula $w=8$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Compute the gradient 
+\begin_inset Formula $\partial_{x}(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $\partial_{y}(i,j)$
+\end_inset
+
+ at each pixel.
+ In our implementation, we use Sobel operator to compute the gradient.
+\end_layout
+
+\begin_layout Enumerate
+Estimate the local orientation of each block centered at pixel 
+\begin_inset Formula $(i,j)$
+\end_inset
+
+ using the following equations:
+\begin_inset Formula 
+\begin{align}
+V_{x}(i,j) & =\sum_{u=i-w/2}^{i+w/2}\sum_{v=j-w/2}^{j+w/2}2\partial_{x}(u,v)\partial_{y}(u,v)\\
+V_{y}(i,j) & =\sum_{u=i-w/2}^{i+w/2}\sum_{v=j-w/2}^{j+w/2}(\partial_{x}^{2}(u,v)-\partial_{y}^{2}(u,v))\\
+\theta(i,j) & =\frac{1}{2}\tan^{-1}(\frac{V_{y}(i,j)}{V_{x}(i,j)})\label{eq:theta}
+\end{align}
+
+\end_inset
+
+where
+\begin_inset Formula $\theta(i,j)$
+\end_inset
+
+ is the estimation of the local ridge orientation at the block centered
+ at pixel 
+\begin_inset Formula $(i,j)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Due to the presence of noise, corrupted ridge, minutiae, etc.
+ some 
+\begin_inset Formula $\theta(i,j)$
+\end_inset
+
+ may not always be a correct estimate.
+ Because local ridge orientation varies slowly, we can add a smooth filter
+ to smooth the ridge orientations.
+ In our implementation, we first use Gaussian filter to smooth 
+\begin_inset Formula $V_{x}(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $V_{y}(i,j)$
+\end_inset
+
+ as follow:
+\begin_inset Formula 
+\begin{align}
+V_{x}'(i,j) & =\sum_{i-w_{g}/2}^{i+w_{g}/2}\sum_{j-w_{g}/2}^{j+w_{g}/2}K(u,v)V_{x}(u,v)\label{eq:smooth}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $K(u,v)$
+\end_inset
+
+ is Gaussian kernel, 
+\begin_inset Formula $w_{g}$
+\end_inset
+
+ is the block size of the filter.
+ We choose sigma=2, 
+\begin_inset Formula $w_{g}=9$
+\end_inset
+
+.
+ After smoothing, we can calculate 
+\begin_inset Formula $\theta(i,j)$
+\end_inset
+
+ using equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:theta"
+
+\end_inset
+
+ except that we use 
+\begin_inset Formula $V_{x}'(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $V_{y}'(i,j)$
+\end_inset
+
+ instead.
+\end_layout
+
+\begin_layout Subsection
+Ridge Frequency Estimation
+\end_layout
+
+\begin_layout Standard
+Local fingerprint image patches are spatially and spectrally similar to
+ s sinusoidal signal, where the dominant peaks in the magnitude spectrums
+ of the two signals are co-located.
+ The location of the dominant peak in the magnitude spectrum of a local
+ image area carries information about the local orientation and frequency
+ of the fingerprint pattern.
+ Because the sample rate in the image is 1, so when the spectrum maximum
+ is in the edge of the image, the ridge frequency is 0.5.
+ So we can estimate the local ridge frequency using equation
+\begin_inset Formula 
+\[
+f=\frac{D}{N}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $D$
+\end_inset
+
+ is the distance from the spectrum maximum to the center of the image.
+ We can easily to obtain wavelength by reciprocating 
+\begin_inset Formula $f$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/ridgeFre.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Gabor Filter
+\end_layout
+
+\begin_layout Standard
+Gabor filter is a linear filter used for edge detection.
+ In the spatial domain, a 2D Gabor filter is a Gaussian kernel function
+ modulated by a sinusoidal plane wave.
+ Gabor filter have both frequency-selective and orientation-selective properties
+ and have optimal joint resolution in both spatial and frequency domains.
+ Therefore, it is appropriate to use Gabor filter as bandpass filter to
+ remove the noise and preserve true ridge structures.
+\begin_inset Formula 
+\begin{equation}
+g(x,y)=\exp\left(-\frac{x'^{2}+\gamma^{2}y'^{2}}{2\sigma^{2}}\right)\cos\left(2\pi\frac{x'}{\lambda}+\psi\right)
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\begin{align*}
+x' & =x\cos\theta+y\sin\theta\\
+y' & =-x\sin\theta+y\cos\theta
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\theta$
+\end_inset
+
+ is the ridge orientation and 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ is the ridge wavelength, both of which can be obtained using methods we
+ mentioned above.
+ In our implementation , we set 
+\begin_inset Formula $\gamma=1$
+\end_inset
+
+, 
+\begin_inset Formula $\psi=0$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma=5$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Experimental Results
+\end_layout
+
+\begin_layout Standard
+Some experimental results are shown in Fig.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_orien.png
+	lyxscale 20
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_gabor.png
+	lyxscale 40
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_orien2.png
+	lyxscale 40
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_gabor2.png
+	lyxscale 40
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Some experimental results.
+ (a) Orientation image of a fingerprint image.
+ (b) Enhanced image.
+ (c) Orientation image of another fingerprint image.
+ (d) Enhanced image.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Binarisation and Thinning
+\end_layout
+
+\begin_layout Standard
+After the fingerprint image is enhanced, it is then converted to binary
+ form, and submitted to the thinning algorithm which reduces the ridge thickness
+ to one pixel wide
+\begin_inset CommandInset citation
+LatexCommand cite
+key "thai2003fingerprint"
+
+\end_inset
+
+.
+ In our implementation, we simply set a threshold 0, all values large than
+ 0 will be changed to 1, and all values less than 0 will be changed to 0.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/neighbor.png
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Neighbors designations in a 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ window
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:neighbor"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+After binarisation, we use thinning algorithm proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "zhang1984fast"
+
+\end_inset
+
+.
+ The main steps of the algorithm is as follows:
+\end_layout
+
+\begin_layout Enumerate
+Define neighbor points as in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:neighbor"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+First subiteration.
+ The point 
+\begin_inset Formula $P_{1}$
+\end_inset
+
+ is deleted from the image if it satisfies the following conditions:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Formula $2\leq B(P_{1})\leq6$
+\end_inset
+
+, where 
+\begin_inset Formula $B(P_{1})$
+\end_inset
+
+ is the number of nonzero neighbors of 
+\begin_inset Formula $P_{1}$
+\end_inset
+
+, that is, 
+\begin_inset Formula $B(P_{1})=P_{2}+P_{3}+\cdots+P_{9}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $A(P_{1})=1$
+\end_inset
+
+, where 
+\begin_inset Formula $A(P_{1})$
+\end_inset
+
+ is the number of 01 patterns in the ordered set 
+\begin_inset Formula $P_{2},P_{3},\cdots,P_{9}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $P_{2}\times P_{4}\times P_{6}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $P_{4}\times P_{6}\times P_{8}=0$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Second subiteration, only conditions c) and d) are changed as follows:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+c')
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $P_{2}\times P_{4}\times P_{8}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument item:1
+status open
+
+\begin_layout Plain Layout
+d')
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $P_{2}\times P_{6}\times P_{8}=0$
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Repeat step 2 and step 3, until no point in the image can be deleted.
+\end_layout
+
+\begin_layout Standard
+After binarisation and thinning, we can obtain images as shown in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:(a)(c)-Binarisation-images."
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_bina.png
+	lyxscale 30
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_thin.png
+	lyxscale 30
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_bina2.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_thin2.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+(a)(c) Binarisation images.
+ (b)(d) Thinning images.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:(a)(c)-Binarisation-images."
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Minutiae Extraction
+\end_layout
+
+\begin_layout Subsection
+Minutiae Extraction
+\end_layout
+
+\begin_layout Standard
+After a fingerprint image has been enhanced and thinned, the next step is
+ to extract the minutiae from the image.
+ The most commonly employed method of minutiae extraction is the Crossing
+ Number (CN) concept.
+ This method extracts the ridge endings and bifurcations from the skeleton
+ image by examining the local neighborhood of each ridge pixel using a 
+\begin_inset Formula $3\times3$
+\end_inset
+
+ window.
+ The CN for a ridge pixel P is given by 
+\begin_inset Formula 
+\begin{equation}
+\text{CN}=0.5\sum_{i=2}^{9}|P_{i}-P_{I+1}|,\quad P_{10}=P_{2}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $P_{i}$
+\end_inset
+
+ is the neighbor pixel as in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:neighbor"
+
+\end_inset
+
+.
+ After the CN for a ridge pixel has been computed, the pixel can then be
+ classified according to the property of its CN value.
+ If CN value equals 1 then it is an ending point, if CN value equals 3,
+ then it is a bifurcation point.
+\end_layout
+
+\begin_layout Subsection
+Minutiae Validation
+\end_layout
+
+\begin_layout Standard
+False minutiae may be introduced into the image due to factors such as noisy
+ images, and image artifacts created by the thinning process.
+ Hence, after the minutiae has been extracted, it is necessary to employ
+ a validation process in order to validate the minutiae.
+ We use the method proposed in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "tico2000algorithm"
+
+\end_inset
+
+ to validate the minutiae.
+\end_layout
+
+\begin_layout Subsection
+Experimental Results
+\end_layout
+
+\begin_layout Standard
+After the minutiae has been extracted and validated, we can obtain the position
+ and orientation of ending points and bifurcation points as shown in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Minutiae-extraction"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_minu.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_minu2.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Minutiae extraction
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Minutiae-extraction"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Matching
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "ref"
+options "IEEEtran"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

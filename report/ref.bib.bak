@@ -1,0 +1,68 @@
+% This file was created with JabRef 2.10b2.
+% Encoding: ISO8859_1
+
+
+@InProceedings{akram2008improved,
+  Title                    = {Improved fingerprint image segmentation using new modified gradient based technique},
+  Author                   = {Akram, M Usman and Nasir, Sarwat and Tariq, Anam and Zafar, Irfan and Khan, Wasim Siddique},
+  Booktitle                = {Electrical and Computer Engineering, 2008. CCECE 2008. Canadian Conference on},
+  Year                     = {2008},
+  Organization             = {IEEE},
+  Pages                    = {001967--001972},
+
+  Owner                    = {zhangzimou},
+  Timestamp                = {2016.12.01}
+}
+
+@Article{bartunek2013adaptive,
+  Title                    = {Adaptive fingerprint image enhancement with emphasis on preprocessing of data},
+  Author                   = {Bartunek, Josef Str{\"o}m and Nilsson, Mikael and Sallberg, Benny and Claesson, Ingvar},
+  Journal                  = {IEEE transactions on image processing},
+  Year                     = {2013},
+  Number                   = {2},
+  Pages                    = {644--656},
+  Volume                   = {22},
+
+  Owner                    = {zhangzimou},
+  Publisher                = {IEEE},
+  Timestamp                = {2016.12.01}
+}
+
+@Article{hong1998fingerprint,
+  Title                    = {Fingerprint image enhancement: algorithm and performance evaluation},
+  Author                   = {Hong, Lin and Wan, Yifei and Jain, Anil},
+  Journal                  = {IEEE transactions on pattern analysis and machine intelligence},
+  Year                     = {1998},
+  Number                   = {8},
+  Pages                    = {777--789},
+  Volume                   = {20},
+
+  Owner                    = {zhangzimou},
+  Publisher                = {IEEE},
+  Timestamp                = {2016.12.01}
+}
+
+@Article{thai2003fingerprint,
+  Title                    = {Fingerprint image enhancement and minutiae extraction},
+  Author                   = {Thai, Raymond},
+  Journal                  = {The University of Western Australia},
+  Year                     = {2003},
+
+  Owner                    = {zhangzimou},
+  Timestamp                = {2016.12.01}
+}
+
+@Article{zhang1984fast,
+  Title                    = {A fast parallel algorithm for thinning digital patterns},
+  Author                   = {Zhang, TY and Suen, Ching Y.},
+  Journal                  = {Communications of the ACM},
+  Year                     = {1984},
+  Number                   = {3},
+  Pages                    = {236--239},
+  Volume                   = {27},
+
+  Owner                    = {zhangzimou},
+  Publisher                = {ACM},
+  Timestamp                = {2016.12.01}
+}
+
