@@ -15,19 +15,23 @@ from numpy.fft import fftshift
 import initial as init
 import time
 from scipy.signal import convolve2d
+import basic.preprocess as pre
 
-#x=np.arange(48);y=np.arange(48)
-#theta=np.pi/2-1.33
-#xx,yy=np.meshgrid(x,y)
-#x1=xx*np.cos(theta)+yy*np.sin(theta);y1=-xx*np.sin(theta)+yy*np.cos(theta)
-#img=(np.cos(2*np.pi*x1/10)+1)*40
-#
+x=np.arange(49);y=np.arange(49)
+theta=0
+xx,yy=np.meshgrid(x,y)
+x1=xx*np.cos(theta)+yy*np.sin(theta);y1=-xx*np.sin(theta)+yy*np.cos(theta)
+img=(np.cos(2*np.pi*x1/2)+1)*40
+
 #noise=np.zeros_like(img)
 #cv2.randn(noise,(0),(70))
 #imgN=img+noise
 #imgN=cv2.imread('test.jpg',0)
-#imshow(imgN)
-#
+imshow(img)
+wl=pre.blkwl(img)
+f=np.abs(fftshift(fft2(img)))
+print wl
+
 #blockSize=16
 ##theta=init.calcDirection(img,blockSize)
 #wl=init.calcWl(img,blockSize)
@@ -43,32 +47,32 @@ from scipy.signal import convolve2d
 
 #start=time.clock()
 #
-img=cv2.imread('pic.png',0)
-blockSize=16
-img,imgfore=init.segmentation(img)
-N,M=img.shape
-X,Y=np.mgrid[0:N:blockSize,0:M:blockSize]
-plt.figure()
-#plt.subplot(1,3,1)
-
-theta=init.calcDirection(img,blockSize)
-plt.quiver(Y,X,np.cos(theta),np.sin(theta),color='r')
-imshow(img)
-#wl=init.calcWl(img,blockSize)
-wl=16*np.ones((7,7))
-#imgR=init.ridgeComp2(img,theta,blockSize)
-imgR=img.copy()
-#plt.subplot(1,3,2)
-plt.figure()
-imshow(imgR)
-#imga=init.inverse(imgR)
-imgG=init.GaborFilter(imgR,blockSize,wl,np.pi/2-theta)
-#imgG[np.where(imgfore==255)]=255
-#imgG=init.inverse(imga)
-#plt.subplot(1,3,3)
-plt.figure()
-imshow(imgG)
-
+#img=cv2.imread('pic.png',0)
+#blockSize=16
+#img,imgfore=init.segmentation(img)
+#N,M=img.shape
+#X,Y=np.mgrid[0:N:blockSize,0:M:blockSize]
+#plt.figure()
+##plt.subplot(1,3,1)
+#
+#theta=init.calcDirection(img,blockSize)
+#plt.quiver(Y,X,np.cos(theta),np.sin(theta),color='r')
+#imshow(img)
+##wl=init.calcWl(img,blockSize)
+#wl=16*np.ones((7,7))
+##imgR=init.ridgeComp2(img,theta,blockSize)
+#imgR=img.copy()
+##plt.subplot(1,3,2)
+#plt.figure()
+#imshow(imgR)
+##imga=init.inverse(imgR)
+#imgG=init.GaborFilter(imgR,blockSize,wl,np.pi/2-theta)
+##imgG[np.where(imgfore==255)]=255
+##imgG=init.inverse(imga)
+##plt.subplot(1,3,3)
+#plt.figure()
+#imshow(imgG)
+#
 
 
 

@@ -26,11 +26,11 @@ from basic import block_view
 FVC0='/home/zhangzimou/Desktop/code_lnk/database/FVC2000/'
 FVC2='/home/zhangzimou/Desktop/code_lnk/database/FVC2002/'
 FVC4='/home/zhangzimou/Desktop/code_lnk/database/FVC2004/'
-path=FVC4+'DB1_B/'
+path=FVC2+'DB1_B/'
 
 blockSize=8
 
-img=cv2.imread(path+'101_3.tif',0)
+img=cv2.imread(path+'101_1.tif',0)
 
 
 

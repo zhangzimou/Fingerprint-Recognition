@@ -42,12 +42,12 @@ def enhance(img,blockSize=8,boxSize=4):
     img=img.copy(order='C').astype(np.float64)
     theta=_pre.calcDirectionBox(img,blockSize,boxSize)
     wl=calcWlBox(img,blockSize,boxSize)
-    
-    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
-    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta)
+    sigma=5
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta,sigma)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta,sigma)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta,sigma)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta,sigma)
+    img=_pre.GaborFilterBox(img,blockSize,boxSize,wl,np.pi/2-theta,sigma)
     
     img=np.asarray(img)
     imgfore=cv2.erode(imgfore,np.ones((8,8)),iterations=4)
@@ -323,11 +323,12 @@ def calcWlDire(img,blockSize):
 
 def blkwl(img):
     """Calculate wavelength  given an image block"""
+    N,M=img.shape
     f=np.abs(fftshift(fft2(img)))
-    origin=np.where(f==np.max(f))
+    origin=(N/2,M/2)
     f[origin]=0
     mmax=np.where(f==np.max(f))
-    wl=2*img.shape[0]/(((origin[0][0]-mmax[0][0])*2)**2+((origin[1][0]-mmax[1][0])*2)**2)**0.5
+    wl=N/((origin[0]-mmax[0][0])**2+(origin[1]-mmax[1][0])**2)**0.5
     return wl
 
 def calcWl(img,blockSize):
