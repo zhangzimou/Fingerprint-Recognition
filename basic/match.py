@@ -189,8 +189,8 @@ def rotate(originx,originy,pointx,pointy,angle):
 	"""
 	Rotate a point cunterclockwise by a given angle around a given origin.
 	"""
-	qx=originx+math.cos(angle*180/math.pi)*(pointx-originx)-math.sin(angle*180/math.pi)*(pointy-originy)
-	qy=originx+math.sin(angle*180/math.pi)*(pointx-originx)+math.cos(angle*180/math.pi)*(pointy-originy)
+	qx=originx+math.cos(angle)*(pointx-originx)-math.sin(angle)*(pointy-originy)
+	qy=originx+math.sin(angle)*(pointx-originx)+math.cos(angle)*(pointy-originy)
 	return qx,qy
 
 def minDistance(closest1T_r,closest1I_r):

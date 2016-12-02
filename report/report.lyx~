@@ -5,6 +5,9 @@
 \save_transient_properties true
 \origin unavailable
 \textclass IEEEtran
+\begin_preamble
+\DeclareMathSizes{11}{10}{7.7}{5.5}
+\end_preamble
 \use_default_options true
 \begin_modules
 logicalmkup
@@ -29,7 +32,7 @@ logicalmkup
 \output_sync 1
 \bibtex_command default
 \index_command default
-\paperfontsize 12
+\paperfontsize 11
 \spacing single
 \use_hyperref true
 \pdf_title "The LyX Tutorial"
@@ -430,44 +433,6 @@ where
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename pic/ridgeFre.png
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -1374,6 +1339,292 @@ name "fig:Minutiae-extraction"
 
 \begin_layout Section
 Matching
+\end_layout
+
+\begin_layout Subsection
+Problem Formulation
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $T(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+ be the template and input fingerprint we are trying to match.
+ 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $T(i,j)$
+\end_inset
+
+ may not have the same number of feature points: let 
+\begin_inset Formula $m$
+\end_inset
+
+ and 
+\begin_inset Formula $n$
+\end_inset
+
+ be the number of point for 
+\begin_inset Formula $T(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+T & =\{m_{1},m_{2},\cdots,m_{m}\},\ \text{with}\ m_{i}=\{x_{i},y_{i},\theta_{i}\}\ i=1...m\\
+I & =\{m_{1}',m_{2}',\cdots,m_{n}'\},\ \text{with}\ m_{j}'=\{x_{i}',y_{j}',\theta_{j}'\}\ j=1...n
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Two minutiae points 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{j}'$
+\end_inset
+
+ are considered to match if their position and orientation are close.
+ This can be written according to equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:sd"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dd"
+
+\end_inset
+
+, using the spatial distance sd, and direction difference dd 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "maltoni2009handbook"
+
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align}
+sd(m_{i},m_{j}') & =\sqrt{(x_{i}-x_{j}')^{2}+(y_{i}-y_{j}')^{2}}<R_{0}\label{eq:sd}\\
+dd(m_{i},m_{j}') & =\text{min}(|\theta_{j}'-\theta_{i}|,360-|\theta_{j}'-\theta_{i}|)<\theta_{0}\label{eq:dd}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $R_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+ are two tolerance parameters we can adjust to improve matching accuracy.
+ 
+\end_layout
+
+\begin_layout Standard
+Let md be the function that says if two minutiae points are close or not
+ i.e.
+ 
+\begin_inset Formula $md(m_{i},m_{j}')=1$
+\end_inset
+
+ if 
+\begin_inset Formula $sd(m_{i},m_{j}')<R_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $dd(m_{i},m_{j}')<\theta_{0}$
+\end_inset
+
+, 0 otherwise.
+\end_layout
+
+\begin_layout Subsection
+Finding Correspondences
+\end_layout
+
+\begin_layout Standard
+As a preprocessing step of Ransac, we should find for each point in the
+ input image which points in the template are matching point possibly.
+ We don’t use conventional solution SIFT because a minutiae point looks
+ like another point; then distance between them would be not accurate.
+ We present a method called geometric hashing 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "germain1997fingerprint"
+
+\end_inset
+
+ which compute for each minutiae point a feature vector.
+ And the smaller the feature distance, the more likely will be the points
+ to match.
+ First, we need to consider a minutiae point 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ in the template set and three closest points from template set: we number
+ them 
+\begin_inset Formula $m_{i,1}$
+\end_inset
+
+, 
+\begin_inset Formula $m_{i,2}$
+\end_inset
+
+, 
+\begin_inset Formula $m_{i,3}$
+\end_inset
+
+.
+ To make feature vector independent of the rotation in the image, we rotate
+ those points of an angle equal to the local orientation of 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+After we have a rotation invariant feature vector in the template and input
+ set, we can compute Euclidean distance between every permutation of the
+ points.
+ Then we combine those numbers.
+ To make it more robust, we allow one point to be wrong and require two
+ points to match as in equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:d2"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+d_{2}(m_{i},m_{j}')=\min_{k_{1}\neq k_{2},l_{1}\neq l_{2}}(D_{k_{1},l_{1}}+D_{k_{2},l_{2}})\label{eq:d2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, for each 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ in the template, we choose the 5 points 
+\begin_inset Formula $m_{j}'$
+\end_inset
+
+ in the input set having smallest 
+\begin_inset Formula $d_{2}$
+\end_inset
+
+ distance and assign them as being the correspondences.
+\end_layout
+
+\begin_layout Subsection
+Ransac
+\end_layout
+
+\begin_layout Standard
+It’s impossible to try every affine transformations due to combinatorial
+ complexity.
+ Thus, we use Ransac to try at random transformations and expect to find
+ a good one.
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $k$
+\end_inset
+
+ be number of iterations required, 
+\begin_inset Formula $d$
+\end_inset
+
+ be number of maximum matching points and 
+\begin_inset Formula $score$
+\end_inset
+
+ be threshold of matching degree.
+ As shown before, 
+\begin_inset Formula $R_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+ be thresholds used to identify that a point fits well.
+ The algorithm is based on three key processes as follows:
+\end_layout
+
+\begin_layout Enumerate
+Take three random points both in template and input set.
+\end_layout
+
+\begin_layout Enumerate
+Find the affine transformation mapping the template random points on the
+ input points.
+\end_layout
+
+\begin_layout Enumerate
+Apply the transformation to all template points.
+ Count the number of points which match and give a score of match.
+ If score is over 
+\begin_inset Formula $score$
+\end_inset
+
+, then we decide these two images are from the same fingerprint.
+\end_layout
+
+\begin_layout Subsection
+Experimental Results
+\end_layout
+
+\begin_layout Standard
+In the test, we use 
+\begin_inset Formula $R_{0}=20$
+\end_inset
+
+, 
+\begin_inset Formula $\theta_{0}=10$
+\end_inset
+
+,
+\begin_inset Formula $k=2000$
+\end_inset
+
+, 
+\begin_inset Formula $score=0.3$
+\end_inset
+
+.
+ We use FVC2002_DB1 as database which give us 16
 \end_layout
 
 \begin_layout Standard

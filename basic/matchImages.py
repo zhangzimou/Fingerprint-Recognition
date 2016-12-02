@@ -5,7 +5,8 @@ Created on Sun Nov 27 2016
 
 @author: Wenxin Fang
 """
-
+import pyximport
+pyximport.install() 
 import cv2
 import numpy as np
 import time
@@ -21,12 +22,13 @@ from scipy.signal import convolve2d
 from basic import imshow
 from preprocess import enhance
 from minutiaeExtract import minutiaeExtract
-from match import minutiaeMatch
+from _match import minutiaeMatch
+import match
 
 start=time.clock()
 
 #open all images in source and store all filenames for search afterwards
-path = 'D:/Grogia Tech/Digital Image processing/Project/Demo/new/basic/test/FVC2002/DB1_B'
+path = '/home/zhangzimou/Desktop/code_lnk/database/FVC2002/DB1_B'
 size, = np.shape(os.listdir(path))
 filename = [1]*size #ten different fingerprints. eight images for same fingerprint
 count = 0
@@ -39,10 +41,14 @@ score = np.zeros([size,1])
 correct = 0
 wrong = 0
 i = 0
+img1 = cv2.imread(path+'/'+filename[i],0)
+imgE1,imgfore1=enhance(img1)
+imgB1=basic.binarize(imgE1)
+imgT1=pre.thinning(imgB1)
 for j in range(size):
 	print "Image %d & Image %d" % (i,j)
 	#input
-	img1 = cv2.imread(path+'/'+filename[i],0)
+	
 	img2 = cv2.imread(path+'/'+filename[j],0)
 	#decide if they same fingerprints due to index of files
 	if i/8 == j/8:
@@ -50,13 +56,9 @@ for j in range(size):
 	else:
 		print "They are from different fingerprint"
 	#preprocess for images
-	img_seg1,imgfore1=pre.segmentation(img1)
-	img_seg2,imgfore2=pre.segmentation(img2)
-	imgE1=enhance(img1)
-	imgE2=enhance(img2)
-	imgB1=basic.binarize(imgE1)
+	
+	imgE2,imgfore2=enhance(img2)
 	imgB2=basic.binarize(imgE2)
-	imgT1=pre.thinning(imgB1)
 	imgT2=pre.thinning(imgB2)
 	matchedPoints_max[j],score[j] = minutiaeMatch(imgT1, imgT2, imgfore1, imgfore2)
 	print "Matched points: %d" % matchedPoints_max[j]

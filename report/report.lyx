@@ -5,6 +5,9 @@
 \save_transient_properties true
 \origin unavailable
 \textclass IEEEtran
+\begin_preamble
+\DeclareMathSizes{11}{10}{7.3}{5}
+\end_preamble
 \use_default_options true
 \begin_modules
 logicalmkup
@@ -29,7 +32,7 @@ logicalmkup
 \output_sync 1
 \bibtex_command default
 \index_command default
-\paperfontsize 12
+\paperfontsize 11
 \spacing single
 \use_hyperref true
 \pdf_title "The LyX Tutorial"
@@ -430,44 +433,6 @@ where
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status collapsed
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename pic/ridgeFre.png
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -1417,8 +1382,8 @@ Let
 .
 \begin_inset Formula 
 \begin{align*}
-T & =\{m_{1},m_{2},\cdots,m_{m}\},\text{with}m_{i}=\{x_{i},y_{i},\theta_{i}\}\quad i=1...m\\
-I & =\{m_{1}',m_{2}',\cdots,m_{n}'\},\text{with}m_{j}'=\{x_{i}',y_{j}',\theta_{j}'\}\quad j=1...n
+T & =\{m_{1},m_{2},\cdots,m_{m}\},\ \text{with}\ m_{i}=\{x_{i},y_{i},\theta_{i}\}\ i=1...m\\
+I & =\{m_{1}',m_{2}',\cdots,m_{n}'\},\ \text{with}\ m_{j}'=\{x_{i}',y_{j}',\theta_{j}'\}\ j=1...n
 \end{align*}
 
 \end_inset

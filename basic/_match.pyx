@@ -54,20 +54,25 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI):
     corresPoint2 = np.zeros([length2T, 5, 2])
     # finding correspondences
     cdef int i, j, n
-    for i in range(0, lengthT):
-        for j in range(0, lengthI):
-            closest1T = findThreeClosest(endingT[i][0], endingT[i][1], endingT)
-            closest1I = findThreeClosest(endingI[j][0], endingI[j][1], endingI)
-            for n in range(0, 3):
-                closest1T_r[n] = rotate(
-                    endingT[i][0], endingT[i][1], closest1T[n][0], closest1T[n][1], theta1T[i])
-                closest1I_r[n] = rotate(
-                    endingI[j][0], endingI[j][1], closest1I[n][0], closest1I[n][1], theta1I[j])
-            dis[j] = minDistance(closest1T_r, closest1I_r)
-        dis_temp = copy.deepcopy(dis)
-        dis_temp.sort()
-        for n in range(0, 5):
-            corresPoint[i][n] = endingI[dis.index(dis_temp[n])]
+    endingFlag = 0
+    if lengthT >= 5 and lengthI >= 5:
+        endingFlag = 1
+        for i in range(0, lengthT):
+            for j in range(0, lengthI):
+                closest1T = findThreeClosest(
+                    endingT[i][0], endingT[i][1], endingT)
+                closest1I = findThreeClosest(
+                    endingI[j][0], endingI[j][1], endingI)
+                for n in range(0, 3):
+                    closest1T_r[n] = rotate(
+                        endingT[i][0], endingT[i][1], closest1T[n][0], closest1T[n][1], theta1T[i])
+                    closest1I_r[n] = rotate(
+                        endingI[j][0], endingI[j][1], closest1I[n][0], closest1I[n][1], theta1I[j])
+                    dis[j] = minDistance(closest1T_r, closest1I_r)
+                    dis_temp = copy.deepcopy(dis)
+                    dis_temp.sort()
+                    for n in range(0, 5):
+                        corresPoint[i][n] = endingI[dis.index(dis_temp[n])]
     bifurFlag = 0
     if length2T >= 5 and length2I >= 5:
         bifurFlag = 1
@@ -112,8 +117,9 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI):
             # random thre points of template set
             from_pt2[n] = bifurT[index2T[n]]
             to_pt2[n] = corresPoint2[index2T[n]][indexI[n]]
-        if (to_pt[0][0] == to_pt[1][0] and to_pt[0][1] == to_pt[1][1]) or (to_pt[1][0] == to_pt[2][0] and to_pt[1][1] == to_pt[2][1]) or (to_pt[0][0] == to_pt[2][0] and to_pt[0][1] == to_pt[2][1]):
-            continue
+        if endingFlag == 1:
+            if (to_pt[0][0] == to_pt[1][0] and to_pt[0][1] == to_pt[1][1]) or (to_pt[1][0] == to_pt[2][0] and to_pt[1][1] == to_pt[2][1]) or (to_pt[0][0] == to_pt[2][0] and to_pt[0][1] == to_pt[2][1]):
+                continue
         if bifurFlag == 1:
             if (to_pt2[0][0] == to_pt2[1][0] and to_pt2[0][1] == to_pt2[1][1]) or (to_pt2[1][0] == to_pt2[2][0] and to_pt2[1][1] == to_pt2[2][1]) or (to_pt2[0][0] == to_pt2[2][0] and to_pt2[0][1] == to_pt2[2][1]):
                 continue
@@ -124,25 +130,27 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI):
             continue
         # apply the transformation to the all template points
         newT = [[0, 0]] * lengthT
-        for i in range(0, lengthT):
-            newT[i] = affineCalculate(endingT[i], matrix_a)
+        if endingFlag == 1:
+            for i in range(0, lengthT):
+                newT[i] = affineCalculate(endingT[i], matrix_a)
         new2T = [[0, 0]] * length2T
         if bifurFlag == 1:
             for i in range(0, length2T):
                 new2T[i] = affineCalculate(bifurT[i], matrix_a2)
         # count number of match points
         d1 = 0  # count of matched points
-        for i in range(0, lengthT):
-            for j in range(0, lengthI):
-                sd = sqrt(
-                    pow(newT[i][0] - endingI[j][0], 2) + pow(newT[i][1] - endingI[j][1], 2))
-                dd = min(
-                    abs(theta1T[i] - theta1I[j]), 2 * math.pi - abs(theta1T[i] - theta1I[j]))
-                # print sd,dd
-                if sd <= R0 and dd <= sigma0:
-                    d1 += 1
-        if d1 > matchedPoints_max:
-            matchedPoints_max = d1
+        if endingFlag == 1:
+            for i in range(0, lengthT):
+                for j in range(0, lengthI):
+                    sd = sqrt(
+                        pow(newT[i][0] - endingI[j][0], 2) + pow(newT[i][1] - endingI[j][1], 2))
+                    dd = min(
+                        abs(theta1T[i] - theta1I[j]), 2 * math.pi - abs(theta1T[i] - theta1I[j]))
+                    # print sd,dd
+                    if sd <= R0 and dd <= sigma0:
+                        d1 += 1
+            if d1 > matchedPoints_max:
+                matchedPoints_max = d1
         d2 = 0  # count of matched points
         if bifurFlag == 1:
             for i in range(0, length2T):
@@ -159,7 +167,7 @@ def minutiaeMatch(imgT, imgI, imgforeT, imgforeI):
         # print  d1+d2
     print matchedPoints_max, matchedPoints_max2
     print lengthT, length2T
-    if bifurFlag == 1:
+    if bifurFlag == 1 and endingFlag == 1:
         score = (float(matchedPoints_max) / lengthT +
                  float(matchedPoints_max2) / length2T) / 2
     else:
@@ -179,7 +187,7 @@ cdef inline double[:, ::1] findThreeClosest(double x, double y, minutiaePoints):
     _xy = np.array(xy)
     _minutiaePoints = np.array(minutiaePoints)
     sub = _xy - _minutiaePoints
-    cdef i, j
+    cdef int i, j
     d1 = [i * i for i in sub.T[0]]
     d2 = [i * i for i in sub.T[1]]
     _d1 = np.array(d1)
@@ -197,7 +205,11 @@ cdef inline double[:, ::1] findThreeClosest(double x, double y, minutiaePoints):
     cdef double[::1] IndexArray = np.zeros(3)
 
     for i in range(3):
-        IndexArray[i] = np.where(distance == _distance[0, i - 1])[1]
+        aaa = np.where(distance == _distance[0, i - 1])[1]
+        if len(aaa) == 1:
+            IndexArray[i] = aaa
+        else:
+            IndexArray[i] = aaa[0]
 
     cdef double[:, ::1] closest = np.ones([3, 2])
     for i in range(3):

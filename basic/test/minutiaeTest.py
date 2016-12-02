@@ -5,9 +5,11 @@ Created on Mon Nov 28 12:02:15 2016
 
 @author: zhangzimou
 """
+import pyximport
+pyximport.install() 
 
 import line_profiler
-
+import os,os.path
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -22,15 +24,18 @@ from preprocess import enhance
 import preprocess as pre
 from minutiaeExtract import minutiaeExtract
 from basic import block_view
+from _match import minutiaeMatch
 
 FVC0='/home/zhangzimou/Desktop/code_lnk/database/FVC2000/'
 FVC2='/home/zhangzimou/Desktop/code_lnk/database/FVC2002/'
 FVC4='/home/zhangzimou/Desktop/code_lnk/database/FVC2004/'
 path=FVC2+'DB1_B/'
 
+
+
 blockSize=8
 
-img=cv2.imread(path+'101_1.tif',0)
+img=cv2.imread(path+'108_3.tif',0)
 
 
 
