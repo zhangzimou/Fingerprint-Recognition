@@ -484,7 +484,7 @@ Gabor filter is a linear filter used for edge detection.
  remove the noise and preserve true ridge structures.
 \begin_inset Formula 
 \begin{equation}
-g(x,y;\lambda,\theta,\psi,\sigma,\gamma)=\exp\left(-\frac{x'^{2}+\gamma^{2}y'^{2}}{2\sigma^{2}}\right)\cos\left(2\pi\frac{x'}{\lambda}+\psi\right)
+g(x,y)=\exp\left(-\frac{x'^{2}+\gamma^{2}y'^{2}}{2\sigma^{2}}\right)\cos\left(2\pi\frac{x'}{\lambda}+\psi\right)
 \end{equation}
 
 \end_inset
@@ -534,6 +534,15 @@ Experimental Results
 \begin_layout Standard
 Some experimental results are shown in Fig.
  
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:orien-enhan"
+
+\end_inset
+
+.
+ We can see that using Gabor filter, we can remove the noise and preserve
+ true ridge structures.
 \end_layout
 
 \begin_layout Standard
@@ -557,7 +566,7 @@ status collapsed
 \begin_inset Graphics
 	filename pic/fig_orien.png
 	lyxscale 20
-	width 45col%
+	width 40col%
 
 \end_inset
 
@@ -597,7 +606,7 @@ status collapsed
 \begin_inset Graphics
 	filename pic/fig_gabor.png
 	lyxscale 40
-	width 45col%
+	width 40col%
 
 \end_inset
 
@@ -644,7 +653,7 @@ status collapsed
 \begin_inset Graphics
 	filename pic/fig_orien2.png
 	lyxscale 40
-	width 45col%
+	width 40col%
 
 \end_inset
 
@@ -684,7 +693,7 @@ status collapsed
 \begin_inset Graphics
 	filename pic/fig_gabor2.png
 	lyxscale 40
-	width 45col%
+	width 40col%
 
 \end_inset
 
@@ -725,6 +734,13 @@ Some experimental results.
  (b) Enhanced image.
  (c) Orientation image of another fingerprint image.
  (d) Enhanced image.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:orien-enhan"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -937,6 +953,18 @@ Repeat step 2 and step 3, until no point in the image can be deleted.
 \end_layout
 
 \begin_layout Standard
+After binarisation and thinning, we can obtain images as shown in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:(a)(c)-Binarisation-images."
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
@@ -950,9 +978,17 @@ status open
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_bina.png
+	lyxscale 30
+	width 40col%
+
+\end_inset
+
 
 \end_layout
 
@@ -985,6 +1021,99 @@ sideways false
 status collapsed
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_thin.png
+	lyxscale 30
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_bina2.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_thin2.png
+	width 40col%
+
+\end_inset
+
 
 \end_layout
 
@@ -1017,6 +1146,14 @@ status collapsed
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
+(a)(c) Binarisation images.
+ (b)(d) Thinning images.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:(a)(c)-Binarisation-images."
+
+\end_inset
+
 
 \end_layout
 
@@ -1103,8 +1240,425 @@ key "tico2000algorithm"
 Experimental Results
 \end_layout
 
+\begin_layout Standard
+After the minutiae has been extracted and validated, we can obtain the position
+ and orientation of ending points and bifurcation points as shown in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Minutiae-extraction"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_minu.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename pic/fig_minu2.png
+	width 40col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Minutiae extraction
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Minutiae-extraction"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Matching
+\end_layout
+
+\begin_layout Subsection
+Problem Formulation
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $T(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+ be the template and input fingerprint we are trying to match.
+ 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $T(i,j)$
+\end_inset
+
+ may not have the same number of feature points: let 
+\begin_inset Formula $m$
+\end_inset
+
+ and 
+\begin_inset Formula $n$
+\end_inset
+
+ be the number of point for 
+\begin_inset Formula $T(i,j)$
+\end_inset
+
+ and 
+\begin_inset Formula $I(i,j)$
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align*}
+T & =\{m_{1},m_{2},\cdots,m_{m}\},\text{with}m_{i}=\{x_{i},y_{i},\theta_{i}\}\quad i=1...m\\
+I & =\{m_{1}',m_{2}',\cdots,m_{n}'\},\text{with}m_{j}'=\{x_{i}',y_{j}',\theta_{j}'\}\quad j=1...n
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Two minutiae points 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{j}'$
+\end_inset
+
+ are considered to match if their position and orientation are close.
+ This can be written according to equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:sd"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dd"
+
+\end_inset
+
+, using the spatial distance sd, and direction difference dd 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "maltoni2009handbook"
+
+\end_inset
+
+.
+\begin_inset Formula 
+\begin{align}
+sd(m_{i},m_{j}') & =\sqrt{(x_{i}-x_{j}')^{2}+(y_{i}-y_{j}')^{2}}<R_{0}\label{eq:sd}\\
+dd(m_{i},m_{j}') & =\text{min}(|\theta_{j}'-\theta_{i}|,360-|\theta_{j}'-\theta_{i}|)<\theta_{0}\label{eq:dd}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $R_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+ are two tolerance parameters we can adjust to improve matching accuracy.
+ 
+\end_layout
+
+\begin_layout Standard
+Let md be the function that says if two minutiae points are close or not
+ i.e.
+ 
+\begin_inset Formula $md(m_{i},m_{j}')=1$
+\end_inset
+
+ if 
+\begin_inset Formula $sd(m_{i},m_{j}')<R_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $dd(m_{i},m_{j}')<\theta_{0}$
+\end_inset
+
+, 0 otherwise.
+\end_layout
+
+\begin_layout Subsection
+Finding Correspondences
+\end_layout
+
+\begin_layout Standard
+As a preprocessing step of Ransac, we should find for each point in the
+ input image which points in the template are matching point possibly.
+ We don’t use conventional solution SIFT because a minutiae point looks
+ like another point; then distance between them would be not accurate.
+ We present a method called geometric hashing 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "germain1997fingerprint"
+
+\end_inset
+
+ which compute for each minutiae point a feature vector.
+ And the smaller the feature distance, the more likely will be the points
+ to match.
+ First, we need to consider a minutiae point 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ in the template set and three closest points from template set: we number
+ them 
+\begin_inset Formula $m_{i,1}$
+\end_inset
+
+, 
+\begin_inset Formula $m_{i,2}$
+\end_inset
+
+, 
+\begin_inset Formula $m_{i,3}$
+\end_inset
+
+.
+ To make feature vector independent of the rotation in the image, we rotate
+ those points of an angle equal to the local orientation of 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+After we have a rotation invariant feature vector in the template and input
+ set, we can compute Euclidean distance between every permutation of the
+ points.
+ Then we combine those numbers.
+ To make it more robust, we allow one point to be wrong and require two
+ points to match as in equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:d2"
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+d_{2}(m_{i},m_{j}')=\min_{k_{1}\neq k_{2},l_{1}\neq l_{2}}(D_{k_{1},l_{1}}+D_{k_{2},l_{2}})\label{eq:d2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, for each 
+\begin_inset Formula $m_{i}$
+\end_inset
+
+ in the template, we choose the 5 points 
+\begin_inset Formula $m_{j}'$
+\end_inset
+
+ in the input set having smallest 
+\begin_inset Formula $d_{2}$
+\end_inset
+
+ distance and assign them as being the correspondences.
+\end_layout
+
+\begin_layout Subsection
+Ransac
+\end_layout
+
+\begin_layout Standard
+It’s impossible to try every affine transformations due to combinatorial
+ complexity.
+ Thus, we use Ransac to try at random transformations and expect to find
+ a good one.
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $k$
+\end_inset
+
+ be number of iterations required, 
+\begin_inset Formula $d$
+\end_inset
+
+ be number of maximum matching points and 
+\begin_inset Formula $score$
+\end_inset
+
+ be threshold of matching degree.
+ As shown before, 
+\begin_inset Formula $R_{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta_{0}$
+\end_inset
+
+ be thresholds used to identify that a point fits well.
+ The algorithm is based on three key processes as follows:
+\end_layout
+
+\begin_layout Enumerate
+Take three random points both in template and input set.
+\end_layout
+
+\begin_layout Enumerate
+Find the affine transformation mapping the template random points on the
+ input points.
+\end_layout
+
+\begin_layout Enumerate
+Apply the transformation to all template points.
+ Count the number of points which match and give a score of match.
+ If score is over 
+\begin_inset Formula $score$
+\end_inset
+
+, then we decide these two images are from the same fingerprint.
+\end_layout
+
+\begin_layout Subsection
+Experimental Results
+\end_layout
+
+\begin_layout Standard
+In the test, we use 
+\begin_inset Formula $R_{0}=20$
+\end_inset
+
+, 
+\begin_inset Formula $\theta_{0}=10$
+\end_inset
+
+,
+\begin_inset Formula $k=2000$
+\end_inset
+
+, 
+\begin_inset Formula $score=0.3$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

@@ -42,11 +42,34 @@
   Timestamp                = {2016.12.01}
 }
 
+@Book{maltoni2009handbook,
+  Title                    = {Handbook of fingerprint recognition},
+  Author                   = {Maltoni, Davide and Maio, Dario and Jain, Anil and Prabhakar, Salil},
+  Publisher                = {Springer Science \& Business Media},
+  Year                     = {2009},
+
+  Owner                    = {zhangzimou},
+  Timestamp                = {2016.12.01}
+}
+
 @Article{thai2003fingerprint,
   Title                    = {Fingerprint image enhancement and minutiae extraction},
   Author                   = {Thai, Raymond},
   Journal                  = {The University of Western Australia},
   Year                     = {2003},
+
+  Owner                    = {zhangzimou},
+  Timestamp                = {2016.12.01}
+}
+
+@InProceedings{tico2000algorithm,
+  Title                    = {An algorithm for fingerprint image postprocessing},
+  Author                   = {Tico, Marius and Kuosmanen, Pauli},
+  Booktitle                = {Signals, Systems and Computers, 2000. Conference Record of the Thirty-Fourth Asilomar Conference on},
+  Year                     = {2000},
+  Organization             = {IEEE},
+  Pages                    = {1735--1739},
+  Volume                   = {2},
 
   Owner                    = {zhangzimou},
   Timestamp                = {2016.12.01}

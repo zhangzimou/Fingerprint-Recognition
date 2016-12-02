@@ -534,6 +534,15 @@ Experimental Results
 \begin_layout Standard
 Some experimental results are shown in Fig.
  
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:orien-enhan"
+
+\end_inset
+
+.
+ We can see that using Gabor filter, we can remove the noise and preserve
+ true ridge structures.
 \end_layout
 
 \begin_layout Standard
@@ -725,6 +734,13 @@ Some experimental results.
  (b) Enhanced image.
  (c) Orientation image of another fingerprint image.
  (d) Enhanced image.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:orien-enhan"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
